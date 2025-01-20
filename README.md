@@ -1,7 +1,6 @@
-# Topics in Computational Social Science 
+# Topics in Computational Social Science - Hilary Term, 2024
 
-This is the repository for the "Topics in Computational Social Science" Course. 
-
+This is the repository for the "Topics in Computational Social Science" course. The lab schedule is given below: 
 
 | Lab | Week | Topic                        |
 |-----|------|------------------------------|
