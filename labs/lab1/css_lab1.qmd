@@ -1,22 +1,22 @@
 ---
 title: "Lab 1"
-author: "<Your name here>"
+author: "Casey Breen"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
-format: html
+format: pdf
 editor: visual
 ---
 
 # Lab 1: Querying the FB Marketing API
 
-In this lab, we'll explore how to obtain FB monthly active user counts broken down by geography, gender, and age. These aggregate FB data can be used to study topics such as migration or digital inequality. Here are some motivating examples of papers that use these data:
+In this lab, we'll explore how to obtain FB monthly active user counts by geography, gender, and age. These data can be used to study topics such as migration or digital inequality, for instance:
 
 -   Fatehkia, Masoomali, Ridhi Kashyap, and Ingmar Weber. 2018. ‘Using Facebook Ad Data to Track the Global Digital Gender Gap’. *World Development* 107:189–209. doi: [10.1016/j.worlddev.2018.03.007](https://doi.org/10.1016/j.worlddev.2018.03.007).
 
 -   Rampazzo, Francesco, Jakub Bijak, Agnese Vitali, Ingmar Weber, and Emilio Zagheni. 2021. ‘A Framework for Estimating Migrant Stocks Using Digital Traces and Survey Data: An Application in the United Kingdom’. *Demography* 58(6):2193–2218. doi: [10.1215/00703370-9578562](https://doi.org/10.1215/00703370-9578562).
 
-To query the Facebook Marketing API (Application Program Interface), we'll use the `rsocialwatcher` package. This R package facilitates querying the FB Marketing API.
+To query the Facebook Marketing API (Application Program Interface), we'll use the `rsocialwatcher` package. This R package helps us query the FB Marketing API.
 
-At a high-level, the package will allow you to give your credentials and some target population (e.g., women aged 15-49 in France). The package then queries the API and returns a dataframe containing the number of Facebook monthly active users for your specified audience.
+The package requires your credentials and some target population (e.g., women aged 15-49 in France). The package then queries the API and returns a dataframe containing the number of Facebook monthly active users for your specified audience.
 
 You'll need to install the `rsocialwatcher` package before working through the lab using the `install.packages("<package_name>")` command.
 
@@ -54,7 +54,7 @@ source("../../private/credentials.R")
 
 # Basic query of FB Marketing API
 
-To query the Facebook Marketing API using the `rsocialwatcher` package, the main function we'll use is: `rsocialwatcher::query_fb_marketing_api().` The package also has lots of other functions as well — to learn more, see the [package website](https://worldbank.github.io/rsocialwatcher/index.html).
+To query the Facebook Marketing API using the `rsocialwatcher` package, the main function we will use is: `rsocialwatcher::query_fb_marketing_api().` The package also has other functions as well — to learn more, see the [package website](https://worldbank.github.io/rsocialwatcher/index.html).
 
 First, we can use the help to learn more about the function using the built in documentation figure.
 
@@ -65,9 +65,6 @@ First, we can use the help to learn more about the function using the built in d
 This function clearly has lots of arguments, but let's focus on the basic functionality for now. Here's the code to query all FB users in Great Britain between the ages of 18 and 65.
 
 ```{r}
-## Set encoding 
-options(encoding = "UTF-8")
-
 ## All Facebook users in Great Britain between ages of 18 and 65 
 fb_mau_users <- query_fb_marketing_api(
   location_unit_type = "countries",
@@ -83,7 +80,7 @@ fb_mau_users
 
 ## Interpreting output
 
-There's lots of different columns here. Let's focus on the most important ones:
+There key columns in the output are:
 
 -   **`estimate_dau`** = number of daily active users
 
@@ -93,19 +90,18 @@ There's lots of different columns here. Let's focus on the most important ones:
 
 -   **`location_keys`** = country code (2-letter)
 
--   `Gender` (1 = male, 2 = female)
+-   `Gender` = gender (1 = male, 2 = female)
 
 -   `age_min` = minimum age
 
 -   `age_max` = maximum age
 
-For simplicity, we'll focus on **`estimate_mau_upper_bound`** for the rest of this lab. This is more stable than the daily active users, which has more day-to-day fluctuations.
+For simplicity, we'll focus on **`estimate_mau_upper_bound`** for the rest of this lab. This is more stable metric than daily active users, which has more day-to-day fluctuations.
 
 ## Exercise 1
 
--   1.1 How many FB monthly active users are in France between the age of 18 and 65? (Use the **`estimate_mau_upper_bound`** column.)
-
--   1.2 How many FB monthly active users in Great Britain are between the ages of 40 and 50? Is this more or less than the number of monthly active users between 30 and 40?
+1.  How many FB monthly active users are in France between the age of 18 and 65? (Use the **`estimate_mau_upper_bound`** column.)
+2.  How many FB monthly active users in Great Britain are between the ages of 40 and 50? Is this more or less than the number of monthly active users between 30 and 40?
 
 ```{r}
 ## exercise 1.1 
@@ -115,7 +111,7 @@ For simplicity, we'll focus on **`estimate_mau_upper_bound`** for the rest of th
 
 ```
 
-## Sending multiple queries
+## Making multiple queries
 
 There are several useful ways to query data for multiple countries, genders, etc. at once.
 
@@ -136,7 +132,7 @@ query_fb_marketing_api(
   token = TOKEN)
 ```
 
-# Investigate age patterns
+# Investigating age patterns
 
 Next, let's investigate age patterns. We'll have to do this separately for each age group (`map_param` doesn't quite work here.)
 
@@ -185,7 +181,7 @@ india_age_mau <- bind_rows(results)
 
 ## Visualization monthly active user age patterns
 
-Now let's visualize age patterns in FB MAU user in India. Before running the code below, take make some prediction about the age groups you anticipate will have the most monthly active users.
+Now let's visualize age patterns in FB MAU user in India. Before running the code below, make a hypothesis about the age groups you anticipate will have the most monthly active users.
 
 First, we'll need to create a variable corresponding to the age category. We'll also convert the gender variable from numeric to character (1 = "men", 2 = "women").
 
@@ -224,12 +220,12 @@ india_age_mau %>%
 
 ## Exercise 2
 
--   2.1 Are there more women or men FB monthly active users in India? What are some potential reasons for this digital gender gap?
--   2.2 What age group has the fewest monthly active users? Did this align with your expectation?
+1.  Are there more women or men FB monthly active users in India? What are some potential reasons for this?
+2.  What age group has the fewest monthly active users? Did this align with your hypothesis?
 
 # Digital gender gaps
 
-To what extent can Facebook tell us about gender inequality in access to the internet? In this section, we'll first query the FB marketing API to produce gender-specific MAU counts for 11 different countries. We'll then calculate basic FB gender gaps and benchmark this with internet digital gender gaps. Here, we'll define a FB gender gap as:
+To what extent can Facebook tell us about gender inequality in access to the internet? In this section, we'll first query the FB marketing API to produce gender-specific MAU counts for 11 different countries. We'll then calculate basic FB gender gaps and benchmark this against internet digital gender gaps. Here, we'll define a FB gender gap as:
 
 $$
 \text{FB}_{\text{Gender gap}} = \frac{\text{MAU}_{women}}{\text{MAU}_{men}}
@@ -260,8 +256,7 @@ Next, we'll query data for each country separately by gender
 ## Query FB marketing api 
 all_countries_gender <- query_fb_marketing_api(
   location_unit_type = "countries",
-  location_keys = map_param("AF", "SE", "IN", "JP", "BR", 
-           "US", "NG", "SA", "FR", "ZA", "CD"),
+  location_keys = map_param_vec(internet_data_gaps$iso2),
   gender = map_param(1, 2),
   version = VERSION,
   creation_act = CREATION_ACT,
@@ -293,7 +288,7 @@ all_countries_gender_wide <- all_countries_gender_wide %>%
 
 ## Visualize results
 
-Finally, we'll visualize our results.
+Now let's investigate the relationship between the FB gender gap and the overall internet gender gap. Do you think they'll be highly correlated?
 
 ```{r}
 ## Basic plot 
@@ -315,8 +310,8 @@ all_countries_gender_wide %>%
 
 ## Exercise 3
 
--   3.1 Calculate the correlation between the MAU Gender Gap and the Internet Gender Gap.
--   3.2 Why might the Facebook gender gap not perfectly correlate with the internet gender gap? What other predictors might be used in conjunction with the Facebook gender gap data to predict internet gender gaps?
+1.  Calculate the correlation between the MAU gender gap and the Internet gender gap.
+2.  In what settings would the FB gender gap not be a good predictor of internet gender gaps? What other predictors might be used in conjunction with the Facebook gender gap data to predict internet gender gaps?
 
 ```{r}
 ## 3.1 

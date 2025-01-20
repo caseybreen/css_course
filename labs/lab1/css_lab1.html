@@ -6,10 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="">
+<meta name="author" content="Casey Breen">
 <meta name="dcterms.date" content="2025-01-20">
 
-<title>Topics in Computational Social Science - Lab 1</title>
+<title>Lab 1</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -110,7 +110,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Topics in Computational Social Science - Lab 1</h1>
+<h1 class="title">Lab 1</h1>
 </div>
 
 
@@ -120,7 +120,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p><your name="" here=""> </your></p>
+             <p>Casey Breen </p>
           </div>
   </div>
     
@@ -139,20 +139,22 @@ window.Quarto = {
 </header>
 
 
-<section id="lab-1---querying-fb-marketing-api" class="level1">
-<h1>Lab 1 - Querying FB Marketing API</h1>
-<p>In this lab, we’ll explore how to obtain FB monthly active user counts broken down by geography, gender, and age. These aggregate FB data can be used to study topics such as migration or digital inequality. Here are some motivating examples of papers that use these data:</p>
+<section id="lab-1-querying-the-fb-marketing-api" class="level1">
+<h1>Lab 1: Querying the FB Marketing API</h1>
+<p>In this lab, we’ll explore how to obtain FB monthly active user counts by geography, gender, and age. These data can be used to study topics such as migration or digital inequality, for instance:</p>
 <ul>
 <li><p>Fatehkia, Masoomali, Ridhi Kashyap, and Ingmar Weber. 2018. ‘Using Facebook Ad Data to Track the Global Digital Gender Gap’. <em>World Development</em> 107:189–209. doi: <a href="https://doi.org/10.1016/j.worlddev.2018.03.007">10.1016/j.worlddev.2018.03.007</a>.</p></li>
 <li><p>Rampazzo, Francesco, Jakub Bijak, Agnese Vitali, Ingmar Weber, and Emilio Zagheni. 2021. ‘A Framework for Estimating Migrant Stocks Using Digital Traces and Survey Data: An Application in the United Kingdom’. <em>Demography</em> 58(6):2193–2218. doi: <a href="https://doi.org/10.1215/00703370-9578562">10.1215/00703370-9578562</a>.</p></li>
 </ul>
-<p>To query the Facebook Marketing API (Application Program Interface), we’ll use using <code>rsocialwatcher</code> package. This software package facilitates querying the marketing API. At a high-level, the package will allow you to give your credentials and some target population (e.g., women aged 15-49 in France). The package then queries the API and returns a dataframe containing the number of Facebook monthly active users for the specified audience.</p>
-<p>You’ll need to install and library the <code>rsocialwatcher</code> package before working through the lab using the <code>install.packages("&lt;package_name&gt;")</code> command.</p>
+<p>To query the Facebook Marketing API (Application Program Interface), we’ll use the <code>rsocialwatcher</code> package. This R package helps us query the FB Marketing API.</p>
+<p>The package requires your credentials and some target population (e.g., women aged 15-49 in France). The package then queries the API and returns a dataframe containing the number of Facebook monthly active users for your specified audience.</p>
+<p>You’ll need to install the <code>rsocialwatcher</code> package before working through the lab using the <code>install.packages("&lt;package_name&gt;")</code> command.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Uncomment below line if you haven't installed rsocialwatcher or tidyverse package </span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("rsocialwatcher")</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("tidyverse")</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ✔ dplyr     1.1.4     ✔ readr     2.1.4
@@ -169,10 +171,10 @@ window.Quarto = {
 </div>
 <section id="credentials" class="level2">
 <h2 class="anchored" data-anchor-id="credentials">Credentials</h2>
-<p>To query the Facebook Marketing API requires creating an account and obtaining credentials. This process for obtaining credentials is fairly straightforward (see <a href="https://worldbank.github.io/rsocialwatcher/articles/create_facebook_credentials.html">instruction here</a>) — feel free to give it a shot outside of the lab, if you’re interested. Here, we’ll use existing credentials.</p>
+<p>To query the Facebook Marketing API requires creating an account and obtaining credentials. This process for obtaining credentials is fairly straightforward (see <a href="https://worldbank.github.io/rsocialwatcher/articles/create_facebook_credentials.html">instruction here</a>) — feel free to give it a shot outside of the lab, if you’re interested. Here, we’ll use our existing credentials.</p>
 <p>We’ll need to load in some credentials before we get started. Specifically, we’ll need the:</p>
 <ul>
-<li>Version</li>
+<li>API Version</li>
 <li>Token</li>
 <li>Creation account</li>
 </ul>
@@ -191,25 +193,22 @@ window.Quarto = {
 </section>
 <section id="basic-query-of-fb-marketing-api" class="level1">
 <h1>Basic query of FB Marketing API</h1>
-<p>To query the Facebook Marketing API using the <code>rsocialwatcher</code> package, the main function we’ll use is: <code>rsocialwatcher::query_fb_marketing_api().</code> The package also has lots of other functions as well — to learn more, see the <a href="https://worldbank.github.io/rsocialwatcher/index.html">package website</a>.</p>
+<p>To query the Facebook Marketing API using the <code>rsocialwatcher</code> package, the main function we will use is: <code>rsocialwatcher::query_fb_marketing_api().</code> The package also has other functions as well — to learn more, see the <a href="https://worldbank.github.io/rsocialwatcher/index.html">package website</a>.</p>
 <p>First, we can use the help to learn more about the function using the built in documentation figure.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>?query_fb_marketing_api</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This function clearly has lots of arguments, but let’s focus on the basic functionality for now. Here’s the code to query all FB users in Great Britain between the ages of 18 and 65.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Set encoding </span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">encoding =</span> <span class="st">"UTF-8"</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="do">## All Facebook users in Great Britain between ages of 18 and 65 </span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>fb_mau_users <span class="ot">&lt;-</span> <span class="fu">query_fb_marketing_api</span>(</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">location_unit_type =</span> <span class="st">"countries"</span>,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">location_keys =</span> <span class="st">"GB"</span>,</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">age_min =</span> <span class="dv">18</span>, </span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">age_max =</span> <span class="dv">65</span>,</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">version =</span> VERSION,</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">creation_act =</span> CREATION_ACT,</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">token =</span> TOKEN)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">## All Facebook users in Great Britain between ages of 18 and 65 </span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>fb_mau_users <span class="ot">&lt;-</span> <span class="fu">query_fb_marketing_api</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">location_unit_type =</span> <span class="st">"countries"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">location_keys =</span> <span class="st">"GB"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">age_min =</span> <span class="dv">18</span>, </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">age_max =</span> <span class="dv">65</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">version =</span> VERSION,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">creation_act =</span> CREATION_ACT,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">token =</span> TOKEN)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
 </div>
@@ -220,29 +219,29 @@ window.Quarto = {
   location_unit_type location_types location_keys gender age_min age_max
 1          countries home or recent            GB 1 or 2      18      65
     api_call_time_utc
-1 2025-01-20 18:56:58</code></pre>
+1 2025-01-20 21:23:16</code></pre>
 </div>
 </div>
 <section id="interpreting-output" class="level2">
 <h2 class="anchored" data-anchor-id="interpreting-output">Interpreting output</h2>
-<p>There’s lots of different columns here. Let’s focus on the most important ones:</p>
+<p>There key columns in the output are:</p>
 <ul>
 <li><p><strong><code>estimate_dau</code></strong> = number of daily active users</p></li>
 <li><p><strong><code>estimate_mau_lower_bound</code></strong> = lower bound estimate of monthly active users</p></li>
 <li><p><strong><code>estimate_mau_upper_bound</code></strong> = upper bound estimate of monthly active users</p></li>
 <li><p><strong><code>location_keys</code></strong> = country code (2-letter)</p></li>
-<li><p><code>Gender</code> (1 = male, 2 = female)</p></li>
+<li><p><code>Gender</code> = gender (1 = male, 2 = female)</p></li>
 <li><p><code>age_min</code> = minimum age</p></li>
 <li><p><code>age_max</code> = maximum age</p></li>
 </ul>
-<p>For simplicity, we’ll focus on <strong><code>estimate_mau_upper_bound</code></strong> for the rest of this lab. This is more stable than the daily active users, which has more day-to-day fluctuations.</p>
+<p>For simplicity, we’ll focus on <strong><code>estimate_mau_upper_bound</code></strong> for the rest of this lab. This is more stable metric than daily active users, which has more day-to-day fluctuations.</p>
 </section>
 <section id="exercise-1" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-1">Exercise 1</h2>
-<ul>
-<li><p>1.1 How many FB monthly active users are in France between the age of 18 and 65? (Use the <strong><code>estimate_mau_upper_bound</code></strong> column.)</p></li>
-<li><p>1.2 How many FB monthly active users in Great Britain are between the ages of 40 and 50? Is this more or less than the number of monthly active users between 30 and 40?</p></li>
-</ul>
+<ol type="1">
+<li>How many FB monthly active users are in France between the age of 18 and 65? (Use the <strong><code>estimate_mau_upper_bound</code></strong> column.)</li>
+<li>How many FB monthly active users in Great Britain are between the ages of 40 and 50? Is this more or less than the number of monthly active users between 30 and 40?</li>
+</ol>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="do">## exercise 1.1 </span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -250,8 +249,8 @@ window.Quarto = {
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="do">## exercise 1.2 </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="sending-multiple-queries" class="level2">
-<h2 class="anchored" data-anchor-id="sending-multiple-queries">Sending multiple queries</h2>
+<section id="making-multiple-queries" class="level2">
+<h2 class="anchored" data-anchor-id="making-multiple-queries">Making multiple queries</h2>
 <p>There are several useful ways to query data for multiple countries, genders, etc. at once.</p>
 <ul>
 <li><p>The <code>map_param</code> function allows you to specify multiple countries, genders, etc. at the same time. This will return multiple rows.</p></li>
@@ -278,7 +277,7 @@ No encoding supplied: defaulting to UTF-8.</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  estimate_dau estimate_mau_lower_bound estimate_mau_upper_bound
-1     99163441                112900000                132800000
+1     99163441                112500000                132400000
 2     40044557                 46200000                 54400000
 3     12218318                 13400000                 15800000
 4    123270235                128300000                151000000
@@ -292,18 +291,18 @@ No encoding supplied: defaulting to UTF-8.</code></pre>
 5          countries home or recent            MX      2      13      65
 6          countries home or recent            CA      2      13      65
     api_call_time_utc
-1 2025-01-20 18:56:59
-2 2025-01-20 18:57:01
-3 2025-01-20 18:57:02
-4 2025-01-20 18:57:03
-5 2025-01-20 18:57:04
-6 2025-01-20 18:57:06</code></pre>
+1 2025-01-20 21:23:17
+2 2025-01-20 21:23:17
+3 2025-01-20 21:23:17
+4 2025-01-20 21:23:18
+5 2025-01-20 21:23:18
+6 2025-01-20 21:23:19</code></pre>
 </div>
 </div>
 </section>
 </section>
-<section id="investigate-age-patterns" class="level1">
-<h1>Investigate age patterns</h1>
+<section id="investigating-age-patterns" class="level1">
+<h1>Investigating age patterns</h1>
 <p>Next, let’s investigate age patterns. We’ll have to do this separately for each age group (<code>map_param</code> doesn’t quite work here.)</p>
 <p>Rather than writing out the same query (with different ages) lots of times, we’ll use a for loop. Spend a minute trying to follow the logic here before running the code!</p>
 <div class="cell">
@@ -361,7 +360,7 @@ No encoding supplied: defaulting to UTF-8.</code></pre>
 </div>
 <section id="visualization-monthly-active-user-age-patterns" class="level2">
 <h2 class="anchored" data-anchor-id="visualization-monthly-active-user-age-patterns">Visualization monthly active user age patterns</h2>
-<p>Now let’s visualize age patterns in FB MAU user in India. Before running the code below, take make some prediction about the age groups you anticipate will have the most monthly active users.</p>
+<p>Now let’s visualize age patterns in FB MAU user in India. Before running the code below, make a hypothesis about the age groups you anticipate will have the most monthly active users.</p>
 <p>First, we’ll need to create a variable corresponding to the age category. We’ll also convert the gender variable from numeric to character (1 = “men”, 2 = “women”).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create age categories variable from age_min and age_max variables  </span></span>
@@ -409,15 +408,15 @@ No encoding supplied: defaulting to UTF-8.</code></pre>
 </section>
 <section id="exercise-2" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-2">Exercise 2</h2>
-<ul>
-<li>2.1 Are there more women or men FB monthly active users in India? What are some potential reasons for this digital gender gap?</li>
-<li>2.2 What age group has the fewest monthly active users? Did this align with your expectation?</li>
-</ul>
+<ol type="1">
+<li>Are there more women or men FB monthly active users in India? What are some potential reasons for this?</li>
+<li>What age group has the fewest monthly active users? Did this align with your hypothesis?</li>
+</ol>
 </section>
 </section>
 <section id="digital-gender-gaps" class="level1">
 <h1>Digital gender gaps</h1>
-<p>To what extent can Facebook tell us about gender inequality in access to the internet? In this section, we’ll first query the FB marketing API to produce gender-specific MAU counts for 11 different countries. We’ll then calculate basic FB gender gaps and benchmark this with internet digital gender gaps. Here, we’ll define a FB gender gap as:</p>
+<p>To what extent can Facebook tell us about gender inequality in access to the internet? In this section, we’ll first query the FB marketing API to produce gender-specific MAU counts for 11 different countries. We’ll then calculate basic FB gender gaps and benchmark this against internet digital gender gaps. Here, we’ll define a FB gender gap as:</p>
 <p><span class="math display">\[
 \text{FB}_{\text{Gender gap}} = \frac{\text{MAU}_{women}}{\text{MAU}_{men}}
 \]</span></p>
@@ -443,12 +442,11 @@ No encoding supplied: defaulting to UTF-8.</code></pre>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Query FB marketing api </span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>all_countries_gender <span class="ot">&lt;-</span> <span class="fu">query_fb_marketing_api</span>(</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">location_unit_type =</span> <span class="st">"countries"</span>,</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">location_keys =</span> <span class="fu">map_param</span>(<span class="st">"AF"</span>, <span class="st">"SE"</span>, <span class="st">"IN"</span>, <span class="st">"JP"</span>, <span class="st">"BR"</span>, </span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>           <span class="st">"US"</span>, <span class="st">"NG"</span>, <span class="st">"SA"</span>, <span class="st">"FR"</span>, <span class="st">"ZA"</span>, <span class="st">"CD"</span>),</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">gender =</span> <span class="fu">map_param</span>(<span class="dv">1</span>, <span class="dv">2</span>),</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">version =</span> VERSION,</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">creation_act =</span> CREATION_ACT,</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">token =</span> TOKEN)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">location_keys =</span> <span class="fu">map_param_vec</span>(internet_data_gaps<span class="sc">$</span>iso2),</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">gender =</span> <span class="fu">map_param</span>(<span class="dv">1</span>, <span class="dv">2</span>),</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">version =</span> VERSION,</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">creation_act =</span> CREATION_ACT,</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">token =</span> TOKEN)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>No encoding supplied: defaulting to UTF-8.
 No encoding supplied: defaulting to UTF-8.
@@ -496,7 +494,7 @@ No encoding supplied: defaulting to UTF-8.</code></pre>
 </div>
 <section id="visualize-results" class="level2">
 <h2 class="anchored" data-anchor-id="visualize-results">Visualize results</h2>
-<p>Finally, we’ll visualize our results.</p>
+<p>Now let’s investigate the relationship between the FB gender gap and the overall internet gender gap. Do you think they’ll be highly correlated?</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Basic plot </span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>all_countries_gender_wide <span class="sc">%&gt;%</span> </span>
@@ -530,10 +528,10 @@ No encoding supplied: defaulting to UTF-8.</code></pre>
 </section>
 <section id="exercise-3" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-3">Exercise 3</h2>
-<ul>
-<li>3.1 Calculate the correlation between the MAU Gender Gap and the Internet Gender Gap.</li>
-<li>3.2 Why might the Facebook gender gap not perfectly correlate with the internet gender gap? What other predictors might be used in conjunction with the Facebook gender gap data to predict internet gender gaps?</li>
-</ul>
+<ol type="1">
+<li>Calculate the correlation between the MAU gender gap and the Internet gender gap.</li>
+<li>In what settings would the FB gender gap not be a good predictor of internet gender gaps? What other predictors might be used in conjunction with the Facebook gender gap data to predict internet gender gaps?</li>
+</ol>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 3.1 </span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: </span></span>
