@@ -1,0 +1,235 @@
+---
+title: "Lab 2"
+format: html
+editor: visual
+---
+
+## Lab 2: Machine Learning and Prediction
+
+In this lab, we'll cover some of the basics of simulate some data and calculate some error metrics. We'll use OLS and different machine learning algorithms
+
+Next, we'll apply machine learning to a real-world problem: estimating digital adoption.
+
+## Exercise 1
+
+First, we'll simulate some data. This can be a helpful thing to do to help build intuition.
+
+First, we'll load in all the packages we'll need for the analysis.
+
+```{r}
+library(tidyverse)     ## tidyverse 
+library(tidymodels)    ## machine learning package 
+library(cowplot)       ## pretty plots 
+```
+
+First, we'll simulate some simple data. Simulation can be a powerful way of learning new statistical concepts, especially new ones.
+
+```{r}
+set.seed(42)
+
+## linear data 
+coffee_linear = runif(5000, 20, 60)
+stress_linear = coffee_linear + rnorm(5000, 0, 3)
+
+## non-linear data 
+coffee_nonlinear = runif(5000, 20, 60)
+stress_nonlinear = sin(coffee_nonlinear*0.75)*10 + coffee_nonlinear + rnorm(5000, 0, 3)
+
+## combine into one data frame 
+sim_data_linear <- data.frame(x = coffee_linear, y= stress_linear)
+
+sim_data_nonlinear <- data.frame(x = coffee_nonlinear, y = stress_nonlinear)
+```
+
+## Exploratory data analysis
+
+The first thing that you want to do when you get new data is visualize it.
+
+```{r}
+## plot linear relationship 
+ggplot(sim_data_linear, aes(x = x, y = y)) +
+  geom_point(alpha = 0.2) +
+  labs(
+    title = "Linear relationship",
+    x = "X",
+    y = "Y"
+  ) +
+  theme_bw() 
+
+## plot non-linear relationship 
+ggplot(sim_data_nonlinear, aes(x = x, y = y)) +
+  geom_point(alpha = 0.2) +
+  labs(
+    title = "Non-Linear Data",
+    x = "x",
+    y = "y"
+  ) +
+  theme_bw() 
+```
+
+You've been tasked with training a model to predict the relationship between coffee consumption and productivity in both world A (linear) and world B (non-linear). You're interested in how well your models perform.
+
+To assess this, we are going to split into a training dataset and a test dataset.
+
+```{r}
+## split into two folds (partitions)
+sim_data_linear_split <- initial_split(sim_data_linear, prop = .75)
+sim_data_nonlinear_split <- initial_split(sim_data_nonlinear, prop = .75)
+
+## split into a train-test sample 
+train_linear_data <- training(sim_data_linear_split)
+test_linear_data <- testing(sim_data_linear_split)
+
+## split into a nonlinear train-test sample 
+train_nonlinear_data <- training(sim_data_nonlinear_split)
+test_nonlinear_data <- testing(sim_data_nonlinear_split)
+```
+
+## Simple Ordinary Least Squares (OLS) Regression Model
+
+First, we'll try fitting an OLS model. This is often the best place to start!
+
+```{r}
+# Fit models
+model1 <- lm(x ~ y, data = train_linear_data)
+model2 <- lm(x ~ y, data = train_nonlinear_data)
+
+# Predict on the test datasets
+predictions_linear <- predict(model1, newdata = test_linear_data)
+predictions_nonlinear <- predict(model2, newdata = test_nonlinear_data)
+
+# Add predictions to the test datasets
+test_linear_data <- test_linear_data %>% mutate(predicted = predictions_linear)
+test_nonlinear_data <- test_nonlinear_data %>% mutate(predicted = predictions_nonlinear)
+```
+
+## Comparing Model Performance
+
+There are several model performance metrics. We'll calculate a few popular error metrics.
+
+-   mean absolute error (MAE)
+-   mean squared error (MSE)
+-   R-squared ($R^2$)
+
+$$
+\text{MAE} = \frac{1}{n} \sum_{i=1}^n |y_i - \hat{y}_i|
+$$ $$
+\text{MSE} = \frac{1}{n} \sum_{i=1}^n (y_i - \hat{y}_i)^2
+$$
+
+$$
+R^2 = 1 - \frac{\sum_{i=1}^n (y_i - \hat{y}_i)^2}{\sum_{i=1}^n (y_i - \bar{y})^2}$$
+
+```{r}
+# Calculate accuracy metrics
+linear_mae <- mean(abs(test_linear_data$x - test_linear_data$predicted))
+nonlinear_mae <- mean(abs(test_nonlinear_data$x - test_nonlinear_data$predicted))
+
+# Calculate accuracy metrics
+linear_mse <- mean((test_linear_data$x - test_linear_data$predicted)^2)
+nonlinear_mse <- mean((test_nonlinear_data$x - test_nonlinear_data$predicted)^2)
+
+# R-squared for linear model
+linear_r_squared <- 1 - (sum((test_linear_data$x - test_linear_data$predicted)^2) / 
+                         sum((test_linear_data$x - mean(test_linear_data$x))^2))
+
+# R-squared for nonlinear model
+nonlinear_r_squared <- 1 - (sum((test_nonlinear_data$x - test_nonlinear_data$predicted)^2) / 
+                            sum((test_nonlinear_data$x - mean(test_nonlinear_data$x))^2))
+
+# Print results
+# Organise metrics into a data frame
+results <- data.frame(
+  Model = c("Linear (LM) ", "Nonlinear (LM)"),
+  MAE = c(linear_mae, nonlinear_mae),
+  MSE = c(linear_mse, nonlinear_mse),
+  R_squared = c(linear_r_squared, nonlinear_r_squared)
+)
+
+results
+
+```
+
+```{r}
+# Define a random forest model specification
+rf_spec <- rand_forest(mtry = 2, trees = 500, min_n = 5) %>%
+  set_engine("ranger") %>%
+  set_mode("regression")
+
+# Fit the random forest model on the linear dataset
+rf_fit_linear <- rf_spec %>%
+  fit(x ~ y, data = train_linear_data)
+
+# Fit the random forest model on the nonlinear dataset
+rf_fit_nonlinear <- rf_spec %>%
+  fit(x ~ y, data = train_nonlinear_data)
+
+# Predict on the test datasets
+rf_predictions_linear <- rf_fit_linear %>%
+  predict(new_data = test_linear_data)
+
+rf_predictions_nonlinear <- rf_fit_nonlinear %>%
+  predict(new_data = test_nonlinear_data)
+
+# Add predictions to the test datasets
+rf_test_linear_data <- test_nonlinear_data %>%
+  mutate(predicted = rf_predictions_linear$.pred)
+
+rf_test_nonlinear_data <- test_nonlinear_data %>%
+  mutate(predicted = rf_predictions_nonlinear$.pred)
+
+```
+
+```{r}
+# Calculate accuracy metrics
+rf_linear_mae <- mean(abs(rf_test_linear_data$x - rf_test_linear_data$predicted))
+rf_nonlinear_mae <- mean(abs(rf_test_nonlinear_data$x - rf_test_nonlinear_data$predicted))
+
+rf_linear_mse <- mean((rf_test_linear_data$x - rf_test_linear_data$predicted)^2)
+rf_nonlinear_mse <- mean((rf_test_nonlinear_data$x - rf_test_nonlinear_data$predicted)^2)
+
+rf_linear_r_squared <- 1 - (sum((rf_test_linear_data$x - rf_test_linear_data$predicted)^2) / 
+                            sum((rf_test_linear_data$x - mean(rf_test_linear_data$x))^2))
+
+rf_nonlinear_r_squared <- 1 - (sum((rf_test_nonlinear_data$x - rf_test_nonlinear_data$predicted)^2) / 
+                               sum((rf_test_nonlinear_data$x - mean(rf_test_nonlinear_data$x))^2))
+
+# Organise metrics into a renamed data frame
+rf_results <- data.frame(
+  Model = c("Linear (Random Forest)", "Nonlinear (Random Forest)"),
+  MAE = c(rf_linear_mae, rf_nonlinear_mae),
+  MSE = c(rf_linear_mse, rf_nonlinear_mse),
+  R_squared = c(rf_linear_r_squared, rf_nonlinear_r_squared)
+)
+
+# Print the results
+print(rf_results)
+```
+
+## Exercise 1:
+
+```{r}
+# Plot for the linear dataset
+linear_plot <- rf_test_linear_data %>%
+  ggplot(aes(x = x, y = predicted)) +
+  geom_point(color = "blue", alpha = 0.6) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
+  labs(
+    title = "Real vs. Predicted Values: Linear Dataset (Random Forest)",
+    x = "Actual Values",
+    y = "Predicted Values"
+  ) +
+  theme_minimal()
+
+# Plot for the nonlinear dataset
+nonlinear_plot <- rf_test_nonlinear_data %>%
+  ggplot(aes(x = x, y = predicted)) +
+  geom_point(color = "green", alpha = 0.6) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
+  labs(
+    title = "Real vs. Predicted Values: Nonlinear Dataset (Random Forest)",
+    x = "Actual Values",
+    y = "Predicted Values"
+  ) +
+  theme_minimal()
+```
