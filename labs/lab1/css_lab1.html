@@ -165,10 +165,7 @@ window.Quarto = {
 ✖ dplyr::lag()    masks stats::lag()
 ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rsocialwatcher)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Set encoding </span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">encoding =</span> <span class="st">"UTF-8"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rsocialwatcher)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="credentials" class="level2">
 <h2 class="anchored" data-anchor-id="credentials">Credentials</h2>
@@ -182,7 +179,7 @@ window.Quarto = {
 <p>We can load these from a separate credentials script. You’ll need to update the script with the correct path to your credentials.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## give path to credentials file</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"../private/credentials.R"</span>) </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"../../private/credentials.R"</span>) </span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="do">#### Alternatively, directly supply credentials </span></span>
@@ -201,15 +198,18 @@ window.Quarto = {
 </div>
 <p>This function clearly has lots of arguments, but let’s focus on the basic functionality for now. Here’s the code to query all FB users in Great Britain between the ages of 18 and 65.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">## All Facebook users in Great Britain between ages of 18 and 65 </span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>fb_mau_users <span class="ot">&lt;-</span> <span class="fu">query_fb_marketing_api</span>(</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">location_unit_type =</span> <span class="st">"countries"</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">location_keys =</span> <span class="st">"GB"</span>,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">age_min =</span> <span class="dv">18</span>, </span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">age_max =</span> <span class="dv">65</span>,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">version =</span> VERSION,</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">creation_act =</span> CREATION_ACT,</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">token =</span> TOKEN)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Set encoding </span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">encoding =</span> <span class="st">"UTF-8"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="do">## All Facebook users in Great Britain between ages of 18 and 65 </span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>fb_mau_users <span class="ot">&lt;-</span> <span class="fu">query_fb_marketing_api</span>(</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">location_unit_type =</span> <span class="st">"countries"</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">location_keys =</span> <span class="st">"GB"</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">age_min =</span> <span class="dv">18</span>, </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">age_max =</span> <span class="dv">65</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">version =</span> VERSION,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">creation_act =</span> CREATION_ACT,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">token =</span> TOKEN)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
 </div>
@@ -220,7 +220,7 @@ window.Quarto = {
   location_unit_type location_types location_keys gender age_min age_max
 1          countries home or recent            GB 1 or 2      18      65
     api_call_time_utc
-1 2025-01-20 13:34:05</code></pre>
+1 2025-01-20 18:56:58</code></pre>
 </div>
 </div>
 <section id="interpreting-output" class="level2">
@@ -279,11 +279,11 @@ No encoding supplied: defaulting to UTF-8.</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>  estimate_dau estimate_mau_lower_bound estimate_mau_upper_bound
 1     99163441                112900000                132800000
-2     40055496                 46300000                 54500000
+2     40044557                 46200000                 54400000
 3     12218318                 13400000                 15800000
-4    123156991                128300000                151000000
-5     45634032                 49900000                 58700000
-6     14577350                 15000000                 17600000
+4    123270235                128300000                151000000
+5     45603169                 49800000                 58600000
+6     14587029                 15000000                 17600000
   location_unit_type location_types location_keys gender age_min age_max
 1          countries home or recent            US      1      13      65
 2          countries home or recent            MX      1      13      65
@@ -292,12 +292,12 @@ No encoding supplied: defaulting to UTF-8.</code></pre>
 5          countries home or recent            MX      2      13      65
 6          countries home or recent            CA      2      13      65
     api_call_time_utc
-1 2025-01-20 13:34:05
-2 2025-01-20 13:34:05
-3 2025-01-20 13:34:06
-4 2025-01-20 13:34:06
-5 2025-01-20 13:34:06
-6 2025-01-20 13:34:07</code></pre>
+1 2025-01-20 18:56:59
+2 2025-01-20 18:57:01
+3 2025-01-20 18:57:02
+4 2025-01-20 18:57:03
+5 2025-01-20 18:57:04
+6 2025-01-20 18:57:06</code></pre>
 </div>
 </div>
 </section>
@@ -462,1062 +462,7 @@ No encoding supplied: defaulting to UTF-8.
 No encoding supplied: defaulting to UTF-8.
 No encoding supplied: defaulting to UTF-8.
 No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in doTryCatch(return(expr), name, parentenv, handler): Error message
-from 'Facebook Marketing' API</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Too many calls, so pausing for 30 seconds then will try the query again; will only move to the next API query after the current query has successfully been called.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in value[[3L]](cond): Error code: 80004
-
-Warning in value[[3L]](cond): (#80004) There have been too many calls to this
-ad-account. Wait a bit and try again. For more info, please refer to
-https://developers.facebook.com/docs/graph-api/overview/rate-limiting#ads-management.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.
+No encoding supplied: defaulting to UTF-8.
 No encoding supplied: defaulting to UTF-8.
 No encoding supplied: defaulting to UTF-8.
 No encoding supplied: defaulting to UTF-8.
@@ -1532,31 +477,31 @@ No encoding supplied: defaulting to UTF-8.</code></pre>
 <p>Now we need to manipulate our data so it’s in the right form for our analysis. Recoding, reshaping, and merging data is often one of the most important and time consuming steps in any data analysis project.</p>
 <p>Take a minute to try to understand what each line is doing before running it.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb272"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb272-1"><a href="#cb272-1" aria-hidden="true" tabindex="-1"></a><span class="do">## recode gender </span></span>
-<span id="cb272-2"><a href="#cb272-2" aria-hidden="true" tabindex="-1"></a>all_countries_gender <span class="ot">&lt;-</span> all_countries_gender <span class="sc">%&gt;%</span> </span>
-<span id="cb272-3"><a href="#cb272-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gender_recode =</span> <span class="fu">case_when</span>(</span>
-<span id="cb272-4"><a href="#cb272-4" aria-hidden="true" tabindex="-1"></a>    gender <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"male"</span>,</span>
-<span id="cb272-5"><a href="#cb272-5" aria-hidden="true" tabindex="-1"></a>    gender <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"female"</span></span>
-<span id="cb272-6"><a href="#cb272-6" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb272-7"><a href="#cb272-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb272-8"><a href="#cb272-8" aria-hidden="true" tabindex="-1"></a><span class="do">## reshape data from long to wide </span></span>
-<span id="cb272-9"><a href="#cb272-9" aria-hidden="true" tabindex="-1"></a>all_countries_gender_wide <span class="ot">&lt;-</span> all_countries_gender <span class="sc">%&gt;%</span> </span>
-<span id="cb272-10"><a href="#cb272-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(location_keys, gender_recode, estimate_mau_upper_bound) <span class="sc">%&gt;%</span> </span>
-<span id="cb272-11"><a href="#cb272-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> gender_recode, <span class="at">values_from =</span> estimate_mau_upper_bound) </span>
-<span id="cb272-12"><a href="#cb272-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb272-13"><a href="#cb272-13" aria-hidden="true" tabindex="-1"></a><span class="do">## calculate gender ratios</span></span>
-<span id="cb272-14"><a href="#cb272-14" aria-hidden="true" tabindex="-1"></a>all_countries_gender_wide <span class="ot">&lt;-</span> all_countries_gender_wide <span class="sc">%&gt;%</span> </span>
-<span id="cb272-15"><a href="#cb272-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">facebook_mau_gender_ratio =</span> female<span class="sc">/</span>male) <span class="sc">%&gt;%</span> </span>
-<span id="cb272-16"><a href="#cb272-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(internet_data_gaps, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"location_keys"</span> <span class="ot">=</span> <span class="st">"iso2"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="do">## recode gender </span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>all_countries_gender <span class="ot">&lt;-</span> all_countries_gender <span class="sc">%&gt;%</span> </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gender_recode =</span> <span class="fu">case_when</span>(</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    gender <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"male"</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    gender <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"female"</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="do">## reshape data from long to wide </span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>all_countries_gender_wide <span class="ot">&lt;-</span> all_countries_gender <span class="sc">%&gt;%</span> </span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(location_keys, gender_recode, estimate_mau_upper_bound) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> gender_recode, <span class="at">values_from =</span> estimate_mau_upper_bound) </span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="do">## calculate gender ratios</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>all_countries_gender_wide <span class="ot">&lt;-</span> all_countries_gender_wide <span class="sc">%&gt;%</span> </span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">facebook_mau_gender_ratio =</span> female<span class="sc">/</span>male) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(internet_data_gaps, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"location_keys"</span> <span class="ot">=</span> <span class="st">"iso2"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="visualize-results" class="level2">
 <h2 class="anchored" data-anchor-id="visualize-results">Visualize results</h2>
 <p>Finally, we’ll visualize our results.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb273"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb273-1"><a href="#cb273-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Basic plot </span></span>
-<span id="cb273-2"><a href="#cb273-2" aria-hidden="true" tabindex="-1"></a>all_countries_gender_wide <span class="sc">%&gt;%</span> </span>
-<span id="cb273-3"><a href="#cb273-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> facebook_mau_gender_ratio, <span class="at">y =</span> internet_gender_gap)) <span class="sc">+</span> </span>
-<span id="cb273-4"><a href="#cb273-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Basic plot </span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>all_countries_gender_wide <span class="sc">%&gt;%</span> </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> facebook_mau_gender_ratio, <span class="at">y =</span> internet_gender_gap)) <span class="sc">+</span> </span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1564,16 +509,16 @@ No encoding supplied: defaulting to UTF-8.</code></pre>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb274"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb274-1"><a href="#cb274-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fancy plot </span></span>
-<span id="cb274-2"><a href="#cb274-2" aria-hidden="true" tabindex="-1"></a>all_countries_gender_wide <span class="sc">%&gt;%</span> </span>
-<span id="cb274-3"><a href="#cb274-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> facebook_mau_gender_ratio, <span class="at">y =</span> internet_gender_gap, <span class="at">label =</span> location_keys)) <span class="sc">+</span> </span>
-<span id="cb274-4"><a href="#cb274-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>() <span class="sc">+</span> </span>
-<span id="cb274-5"><a href="#cb274-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="fl">1.5</span>) <span class="sc">+</span> </span>
-<span id="cb274-6"><a href="#cb274-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="dv">0</span>, <span class="fl">1.5</span>) <span class="sc">+</span> </span>
-<span id="cb274-7"><a href="#cb274-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span> </span>
-<span id="cb274-8"><a href="#cb274-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
-<span id="cb274-9"><a href="#cb274-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Facebook MAU Gender Gap"</span>,</span>
-<span id="cb274-10"><a href="#cb274-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Internet Gender Gap"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fancy plot </span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>all_countries_gender_wide <span class="sc">%&gt;%</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> facebook_mau_gender_ratio, <span class="at">y =</span> internet_gender_gap, <span class="at">label =</span> location_keys)) <span class="sc">+</span> </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>() <span class="sc">+</span> </span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="fl">1.5</span>) <span class="sc">+</span> </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="dv">0</span>, <span class="fl">1.5</span>) <span class="sc">+</span> </span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span> </span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Facebook MAU Gender Gap"</span>,</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Internet Gender Gap"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1590,10 +535,10 @@ No encoding supplied: defaulting to UTF-8.</code></pre>
 <li>3.2 Why might the Facebook gender gap not perfectly correlate with the internet gender gap? What other predictors might be used in conjunction with the Facebook gender gap data to predict internet gender gaps?</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb275"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb275-1"><a href="#cb275-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 3.1 </span></span>
-<span id="cb275-2"><a href="#cb275-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: </span></span>
-<span id="cb275-3"><a href="#cb275-3" aria-hidden="true" tabindex="-1"></a><span class="co"># all_countries_gender_wide %&gt;% </span></span>
-<span id="cb275-4"><a href="#cb275-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   summarize(cor(___, ___))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 3.1 </span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: </span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co"># all_countries_gender_wide %&gt;% </span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   summarize(cor(___, ___))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>

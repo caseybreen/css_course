@@ -1,12 +1,12 @@
 ---
-title: "Topics in Computational Social Science - Lab 1"
+title: "Lab 1"
 author: "<Your name here>"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
 format: html
 editor: visual
 ---
 
-# Lab 1 - Querying FB Marketing API
+# Lab 1: Querying the FB Marketing API
 
 In this lab, we'll explore how to obtain FB monthly active user counts broken down by geography, gender, and age. These aggregate FB data can be used to study topics such as migration or digital inequality. Here are some motivating examples of papers that use these data:
 
@@ -14,28 +14,28 @@ In this lab, we'll explore how to obtain FB monthly active user counts broken do
 
 -   Rampazzo, Francesco, Jakub Bijak, Agnese Vitali, Ingmar Weber, and Emilio Zagheni. 2021. ‘A Framework for Estimating Migrant Stocks Using Digital Traces and Survey Data: An Application in the United Kingdom’. *Demography* 58(6):2193–2218. doi: [10.1215/00703370-9578562](https://doi.org/10.1215/00703370-9578562).
 
-To query the Facebook Marketing API (Application Program Interface), we'll use using `rsocialwatcher` package. This software package facilitates querying the marketing API. At a high-level, the package will allow you to give your credentials and some target population (e.g., women aged 15-49 in France). The package then queries the API and returns a dataframe containing the number of Facebook monthly active users for the specified audience.
+To query the Facebook Marketing API (Application Program Interface), we'll use the `rsocialwatcher` package. This R package facilitates querying the FB Marketing API.
 
-You'll need to install and library the `rsocialwatcher` package before working through the lab using the `install.packages("<package_name>")` command.
+At a high-level, the package will allow you to give your credentials and some target population (e.g., women aged 15-49 in France). The package then queries the API and returns a dataframe containing the number of Facebook monthly active users for your specified audience.
+
+You'll need to install the `rsocialwatcher` package before working through the lab using the `install.packages("<package_name>")` command.
 
 ```{r}
 ## Uncomment below line if you haven't installed rsocialwatcher or tidyverse package 
 # install.packages("rsocialwatcher")
 # install.packages("tidyverse")
+
 library(tidyverse)
 library(rsocialwatcher)
-
-## Set encoding 
-options(encoding = "UTF-8")
 ```
 
 ## Credentials
 
-To query the Facebook Marketing API requires creating an account and obtaining credentials. This process for obtaining credentials is fairly straightforward (see [instruction here](https://worldbank.github.io/rsocialwatcher/articles/create_facebook_credentials.html)) — feel free to give it a shot outside of the lab, if you're interested. Here, we'll use existing credentials.
+To query the Facebook Marketing API requires creating an account and obtaining credentials. This process for obtaining credentials is fairly straightforward (see [instruction here](https://worldbank.github.io/rsocialwatcher/articles/create_facebook_credentials.html)) — feel free to give it a shot outside of the lab, if you're interested. Here, we'll use our existing credentials.
 
 We'll need to load in some credentials before we get started. Specifically, we'll need the:
 
--   Version
+-   API Version
 -   Token
 -   Creation account
 
@@ -43,7 +43,7 @@ We can load these from a separate credentials script. You'll need to update the 
 
 ```{r}
 ## give path to credentials file
-source("../private/credentials.R") 
+source("../../private/credentials.R") 
 
 
 #### Alternatively, directly supply credentials 
