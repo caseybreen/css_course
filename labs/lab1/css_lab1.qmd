@@ -24,6 +24,9 @@ You'll need to install and library the `rsocialwatcher` package before working t
 # install.packages("tidyverse")
 library(tidyverse)
 library(rsocialwatcher)
+
+## Set encoding 
+options(encoding = "UTF-8")
 ```
 
 ## Credentials
@@ -62,6 +65,9 @@ First, we can use the help to learn more about the function using the built in d
 This function clearly has lots of arguments, but let's focus on the basic functionality for now. Here's the code to query all FB users in Great Britain between the ages of 18 and 65.
 
 ```{r}
+## Set encoding 
+options(encoding = "UTF-8")
+
 ## All Facebook users in Great Britain between ages of 18 and 65 
 fb_mau_users <- query_fb_marketing_api(
   location_unit_type = "countries",
@@ -97,9 +103,9 @@ For simplicity, we'll focus on **`estimate_mau_upper_bound`** for the rest of th
 
 ## Exercise 1
 
-1.  How many FB monthly active users are in France between the age of 18 and 65? (Use the **`estimate_mau_upper_bound`** column.)
+-   1.1 How many FB monthly active users are in France between the age of 18 and 65? (Use the **`estimate_mau_upper_bound`** column.)
 
-2.  How many FB monthly active users in Great Britain are between the ages of 40 and 50? Is this more or less than the number of monthly active users between 30 and 40?
+-   1.2 How many FB monthly active users in Great Britain are between the ages of 40 and 50? Is this more or less than the number of monthly active users between 30 and 40?
 
 ```{r}
 ## exercise 1.1 
@@ -193,7 +199,7 @@ india_age_mau <- india_age_mau %>%
   ))
 ```
 
-We'll Kcreate two visualizations. The first visualization is a basic plot you might make for yourself when you're doing some quick exploratory data analysis. The second is a more polished figure that you might include in a paper.
+We'll create two data visualizations to gain insight into the relationship between age/gender and FB usage. The first visualization is a basic plot you might make for yourself when you're doing some quick exploratory data analysis. The second is a more polished figure that you might include in a paper.
 
 ```{r}
 ## Basic plot 
@@ -210,7 +216,7 @@ india_age_mau %>%
   theme_minimal() + 
   labs(
     x = "Age Category",
-    y = "FB Monthyl Active Users",
+    y = "FB Monthly Active Users",
     color = "Gender",
     title = "India: Facebook MAU by Age/Gender") + 
   theme(legend.position = "bottom")
@@ -218,8 +224,8 @@ india_age_mau %>%
 
 ## Exercise 2
 
--   Are there more women or men FB monthly active users in India? What are some potential reasons for this digital gender gap?
--   What age group has the fewest monthly active users? Did this align with your expectation?
+-   2.1 Are there more women or men FB monthly active users in India? What are some potential reasons for this digital gender gap?
+-   2.2 What age group has the fewest monthly active users? Did this align with your expectation?
 
 # Digital gender gaps
 

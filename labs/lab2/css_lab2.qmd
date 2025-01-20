@@ -1,5 +1,7 @@
 ---
-title: "Lab 2"
+title: "Topics in Computational Social Science - Lab 1"
+author: ""
+date: "`r format(Sys.Date(), '%d %B %Y')`"
 format: html
 editor: visual
 ---
