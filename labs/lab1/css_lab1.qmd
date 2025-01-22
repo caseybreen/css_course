@@ -6,17 +6,17 @@ format: pdf
 editor: visual
 ---
 
-# Lab 1: Querying the FB Marketing API
+# Lab 1
 
-In this lab, we'll explore how to obtain FB monthly active user counts by geography, gender, and age. These data can be used to study topics such as migration or digital inequality, for instance:
+In this lab, we'll explore how to use an API (Application program interface) to obtain FB monthly active user counts by geography, gender, and age. These data can be used to study topics such as migration or digital inequality. For example:
 
 -   Fatehkia, Masoomali, Ridhi Kashyap, and Ingmar Weber. 2018. ‘Using Facebook Ad Data to Track the Global Digital Gender Gap’. *World Development* 107:189–209. doi: [10.1016/j.worlddev.2018.03.007](https://doi.org/10.1016/j.worlddev.2018.03.007).
 
 -   Rampazzo, Francesco, Jakub Bijak, Agnese Vitali, Ingmar Weber, and Emilio Zagheni. 2021. ‘A Framework for Estimating Migrant Stocks Using Digital Traces and Survey Data: An Application in the United Kingdom’. *Demography* 58(6):2193–2218. doi: [10.1215/00703370-9578562](https://doi.org/10.1215/00703370-9578562).
 
-To query the Facebook Marketing API (Application Program Interface), we'll use the `rsocialwatcher` package. This R package helps us query the FB Marketing API.
+To query the Facebook Marketing API, we'll use the `rsocialwatcher` package. This R package helps us query the FB Marketing API.
 
-The package requires your credentials and some target population (e.g., women aged 15-49 in France). The package then queries the API and returns a dataframe containing the number of Facebook monthly active users for your specified audience.
+The package requires credentials and a user-provided target population (e.g., women aged 15-49 in France). The package can then query the API and return a dataframe containing the number of Facebook monthly active users for your specified audience.
 
 You'll need to install the `rsocialwatcher` package before working through the lab using the `install.packages("<package_name>")` command.
 
@@ -43,13 +43,12 @@ We can load these from a separate credentials script. You'll need to update the 
 
 ```{r}
 ## give path to credentials file
-source("../../private/credentials.R") 
+source("../../private/credentials_group3.R") 
 
-
-#### Alternatively, directly supply credentials 
-# VERSION = "enter-version"
-# CREATION_ACT = "creation_act"
-# TOKEN = "enter-token"
+#### Alternatively, directly supply credentials/version
+# VERSION = 
+# CREATION_ACT = "
+# TOKEN = 
 ```
 
 # Basic query of FB Marketing API
@@ -162,7 +161,7 @@ for (i in seq_along(age_groups)) {
   
   # Query the API for the current age group
   results[[i]] <- query_fb_marketing_api(
-    location_unit_type = "countries",
+    location_unit_type = "countries", 
     location_keys = map_param("IN"),
     gender = map_param(1, 2), # Both genders
     age_min = age_min,
@@ -195,7 +194,7 @@ india_age_mau <- india_age_mau %>%
   ))
 ```
 
-We'll create two data visualizations to gain insight into the relationship between age/gender and FB usage. The first visualization is a basic plot you might make for yourself when you're doing some quick exploratory data analysis. The second is a more polished figure that you might include in a paper.
+We'll data visualizations to gain insight into the relationship between age/gender and FB usage. The first visualization is a basic plot you might make for yourself when you're doing some quick exploratory data analysis. It shows the relationship between age range and the mau upper bound. The second is a more polished figure that you might include in a publication.
 
 ```{r}
 ## Basic plot 
@@ -318,5 +317,69 @@ all_countries_gender_wide %>%
 # Hint: 
 # all_countries_gender_wide %>% 
 #   summarize(cor(___, ___))
+```
 
+## Backup data
+
+APIs often give throttle limits to prevent people from overusing them. We may hit a rate limit. In this case, just read in the data below to complete the exercises.
+
+```{r}
+india_age_mau <- data.frame(
+  estimate_mau_upper_bound = c(40500000L,
+                               18200000L,109100000L,
+                               49000000L,
+                               93600000L,38600000L,
+                               65800000L,26600000L,
+                               44800000L,16500000L,
+                               27400000L,10800000L,
+                               17600000L,7100000L),
+  location_keys = c("IN","IN",
+                    "IN","IN","IN",
+                    "IN","IN","IN","IN",
+                    "IN","IN","IN",
+                    "IN","IN"),
+  gender = c("1","2",
+             "1","2","1","2",
+             "1","2","1","2",
+             "1","2","1","2"),
+  age_min = c("15","15",
+              "20","20","25",
+              "25","30","30","35",
+              "35","40","40",
+              "45","45"),
+  age_max = c("19","19",
+              "24","24","29",
+              "29","34","34","39",
+              "39","44","44",
+              "49","49"))
+
+
+all_countries_gender <- data.frame(
+  estimate_mau_upper_bound = c(4400000L,81400000L,
+                               5500000L,22200000L,
+                               438700000L,28800000L,
+                               28700000L,20200000L,
+                               4200000L,
+                               132400000L,15700000L,
+                               902900L,99200000L,
+                               3300000L,24700000L,
+                               179200000L,36300000L,
+                               21200000L,10600000L,
+                               4600000L,
+                               151000000L,16100000L),
+  location_keys = c("AF",
+                    "BR","CD","FR",
+                    "IN","JP","NG",
+                    "SA","SE","US","ZA",
+                    "AF","BR","CD",
+                    "FR","IN","JP",
+                    "NG","SA","SE","US",
+                    "ZA"),
+  gender = c("1",
+             "1","1","1","1",
+             "1","1","1","1",
+             "1","1","2","2",
+             "2","2","2","2",
+             "2","2","2","2",
+             "2"))
 ```
