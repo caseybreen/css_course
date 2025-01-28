@@ -264,6 +264,7 @@ all_countries_gender <- query_fb_marketing_api(
   gender = map_param(1, 2),
   version = VERSION,
   creation_act = CREATION_ACT,
+  sleep_time = 3,
   token = TOKEN)
 ```
 
