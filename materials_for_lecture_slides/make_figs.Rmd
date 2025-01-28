@@ -1,0 +1,139 @@
+---
+title: "Generate figs for lecture slides"
+author: Casey Breen
+---
+
+
+Summary: make lecture slides 
+
+
+```{r}
+library(tidyverse)
+library(data.table)
+library(cowplot)
+library(here)
+```
+
+
+```{r}
+x = runif(120, 0, 10)
+y = 10*x + 0.5*x ^ 3 + rnorm(120, 0, 25)
+
+data <- data.frame(x, y)
+
+over <- ggplot(data, aes(x = x, y= y)) + 
+  geom_point() + 
+  geom_line(color = "red", linewidth = 1) + 
+  theme_cowplot() + 
+  labs(title = "Overfit")
+
+good <- ggplot(data, aes(x = x, y= y)) + 
+  geom_point() + 
+  geom_smooth(color = "red", se = F) + 
+  theme_cowplot() + 
+  labs(title = "Well fit")
+
+
+under <- ggplot(data, aes(x = x, y= y)) + 
+  geom_point() + 
+  geom_smooth(color = "red", se = F,  method = "lm") + 
+  theme_cowplot() + 
+  labs(title = "Under fit")
+  
+cowplot::plot_grid(under, good, over)
+
+
+raw_plot <- ggplot(data, aes(x = x, y= y)) + 
+  geom_point() + 
+  theme_cowplot() 
+
+ggsave(plot = raw_plot, here("figs", "cubic_none.png"), bg= "white", width = 6, height = 4)
+
+ggsave(plot = under, here("figs", "cubic_underfit.png"), bg= "white", width = 6, height = 4)
+
+ggsave(plot = over, here("figs", "cubic_over.png"), bg= "white", width = 6, height = 4)
+
+ggsave(plot = good, here("figs", "cubic_good.png"), bg= "white", width = 6, height = 4)
+
+
+combined_plot <- cowplot::plot_grid(under, good, over, nrow = 1)
+
+
+ggsave(plot = combined_plot, here("figs", "combined_plot.png"), bg = "white", width = 10, height = 4)
+```
+
+
+```{r}
+x = runif(25, min = 0, max = 10)
+
+y = x +  rnorm(25, mean = 0, sd = 1.5)
+
+df <- data.frame(observed = x, predicted = y)
+```
+
+
+
+```{r}
+plot1 <- ggplot(df, aes(x = observed, y = predicted)) +
+ # geom_segment(aes(x = x, xend = x, y = y, yend = predict(lm(y ~ x, data = df))), 
+ #              colour = "red") + 
+  geom_point() + 
+  #geom_smooth(method = "lm", se = F) + 
+  theme_cowplot() 
+
+
+plot2 <- ggplot(df, aes(x = observed, y = predicted)) +
+#  geom_segment(aes(x = x, xend = x, y = y, yend = predict(lm(y ~ x, data = df))), 
+#               colour = "red") + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = F) + 
+  theme_cowplot()
+
+
+plot3 <- ggplot(df, aes(x = observed, y = predicted)) +
+  geom_segment(aes(x = observed, xend = observed, y = predicted, yend = predict(lm(predicted ~ observed, data = df))), 
+               colour = "red") + 
+  geom_point() + 
+  geom_abline(slope = 1, color = "blue") + 
+  theme_cowplot() + 
+  ylim(-1, 12) + 
+  xlim(-1, 12)
+```
+
+
+```{r}
+ggsave(plot = plot1, here("figs", "error_plot1.png"), bg= "white", height = 4, width = 6) 
+ggsave(plot = plot2, here("figs", "error_plot2.png"), bg= "white", height = 4, width = 6) 
+ggsave(plot = plot3, here("figs", "error_plot3.png"), bg= "white", height = 4, width = 6) 
+
+
+```
+
+
+
+```{r}
+# Simulate some binary classification data
+set.seed(123)
+n <- 100
+actual <- sample(c(0, 1), n, replace = TRUE)       # True labels
+predicted_prob <- runif(n)                         # Predicted probabilities
+
+# Compute ROC points manually to ensure curve starts at (0,0) and ends at (1,1)
+roc_points <- data.frame(
+  TPR = c(0, sort(runif(99)), 1),                  # Start at 0 and end at 1
+  FPR = c(0, sort(runif(99)), 1)                   # Start at 0 and end at 1
+)
+
+# Plot the ROC curve with AUC shaded
+ggplot(roc_points, aes(x = FPR, y = TPR)) +
+  geom_area(fill = "grey", alpha = 0.5) +          # AUC shading
+  geom_line(colour = "green", size = 1) +          # ROC curve in green
+  geom_abline(slope = 1, intercept = 0,            # Random guess line
+              linetype = "dashed") +
+  labs(x = "FPR", y = "TPR") +                     # Axis labels
+  annotate("text", x = 0.6, y = 0.4, label = "AUC", size = 5, hjust = 1.2) +
+  annotate("text", x = 0.8, y = 0.85, label = "ROC", colour = "green", size = 5) +
+  theme_minimal()                                # Clean theme
+```
+
+

@@ -45,11 +45,11 @@ We can load these from a separate credentials script. You'll need to update the 
 
 ```{r}
 ## give path to credentials file -- this is a preferred solution so that we don't publicly release credentials 
-source("../../private/credentials_group3.R") 
+source("../../private/credentials_group5.R") 
 
 #### Alternatively, directly supply credentials/version
 # VERSION = 
-# CREATION_ACT = "
+# CREATION_ACT = 
 # TOKEN = 
 ```
 
@@ -108,7 +108,8 @@ For simplicity, we'll focus on **`estimate_mau_upper_bound`** for the rest of th
 ## exercise 1.1 
 
 
-## exercise 1.2 
+## exercise 1.2
+
 
 ```
 
@@ -130,6 +131,7 @@ query_fb_marketing_api(
   age_max = 65,
   version = VERSION,
   creation_act = CREATION_ACT,
+  sleep_time = 3,
   token = TOKEN)
 ```
 
@@ -170,6 +172,7 @@ for (i in seq_along(age_groups)) {
     age_max = age_max,
     version = VERSION,
     creation_act = CREATION_ACT,
+    sleep_time = 3,
     token = TOKEN
   )
 }
@@ -190,7 +193,7 @@ First, we'll need to create a variable corresponding to the age category. We'll 
 # Create age categories variable from age_min and age_max variables  
 india_age_mau <- india_age_mau %>% 
   mutate(age_range = paste0("[", age_min, ",", age_max, "]")) %>% 
-  mutate(gender = case_when(
+  mutate(gender_recode = case_when(
     gender == 1 ~ "Men",
     gender == 2 ~ "Women"
   ))
@@ -201,12 +204,12 @@ We'll data visualizations to gain insight into the relationship between age/gend
 ```{r}
 ## Basic plot 
 india_age_mau %>% 
-  ggplot(aes(x = age_range, y = estimate_mau_upper_bound, color = gender, group = gender)) + 
+  ggplot(aes(x = age_range, y = estimate_mau_upper_bound, color = gender_recode, group = gender_recode)) + 
   geom_line()
 
 ## Fancy plot 
 india_age_mau %>% 
-  ggplot(aes(x = age_range, y = estimate_mau_upper_bound, color = gender, group = gender)) + 
+  ggplot(aes(x = age_range, y = estimate_mau_upper_bound, color = gender_recode, group = gender_recode)) + 
   geom_line(linewidth = 1) +  # Thicker lines for clarity
   geom_point(size = 3, shape = 21, fill = "white", stroke = 1) +  # Hollow points with white fill
   scale_y_continuous(labels = scales::comma, limits = c(0, max(india_age_mau$estimate_mau_upper_bound))) + 
@@ -317,7 +320,7 @@ all_countries_gender_wide %>%
 ```{r}
 ## 3.1 
 # Hint: 
-# all_countries_gender_wide %>% 
+# all_countries_gender_wide %>%
 #   summarize(cor(___, ___))
 ```
 
