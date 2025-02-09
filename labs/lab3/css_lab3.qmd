@@ -1,0 +1,105 @@
+---
+title: "Topics in Computational Social Science - Lab 3"
+author: ""
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+format: html
+editor: visual
+---
+
+## Lab 3: Non-probability sa
+
+In this lab, we will cover a basic example of non-probability sampling 
+
+In exercise 1, use some simulate data and do a basic. 
+
+In exercise2 , we'll use a network based method (network survival) to estimate mortality rates. We'll use real data for this exercise. 
+
+
+## Exercise 1
+
+
+In this exercise, we'll calculate basic post-stratification weights based on a sample of coffee drinkers. This convenience sample was 
+
+
+```{r}
+library(tidyverse)
+```
+
+
+First, we'll read in some data 
+
+```{r}
+sample_data <- data.frame(
+                  id = 1:20,
+           age_group = c("50+","50+","30-49",
+                         "50+","18-29","18-29","18-29","30-49","18-29","18-29",
+                         "18-29","18-29","50+","30-49","18-29","50+",
+                         "50+","30-49","18-29","18-29"),
+        income_group = c("High","Middle","High",
+                         "High","Middle","Low","Middle","High","Middle",
+                         "High","Low","High","Middle","Low","Middle","High",
+                         "Middle","Middle","High","Low"),
+  coffee_consumption = c(2.7,1.2,2.8,4.2,4.9,
+                         2.6,2.7,1.2,3.5,2.4,3.5,3.7,4,2.4,3.5,1.3,2.2,
+                         2.1,0.6,3))
+
+
+sample_proportion <- sample_data %>% 
+  count(age_group, income_group) %>% 
+  mutate(sample_proportion = n / sum(n))
+```
+
+
+
+Let's assume we have the real population proportions. 
+
+```{r}
+pop_proportion <- data.frame(
+  pop_proportion = c(0.12, 0.2, 0.08, 0.1, 0.25, 0.05, 0.05, 0.1, 0.05),
+  age_group = c("18-29",
+                "30-49","50+","18-29","30-49","50+","18-29",
+                "30-49","50+"),
+  income_group = c("Low","Low",
+                   "Low","Middle","Middle","Middle","High",
+                   "High","High"))
+```
+
+
+```{r}
+## join population proportions together 
+poststrat_weights <- sample_proportion %>% 
+  inner_join(pop_proportion, by = join_by(age_group, income_group)) %>% 
+  mutate(inclusion_prop = sample_proportion / pop_proportion) %>% ## calculate inclusion probably by cell 
+  mutate(weight = 1 / inclusion_prop) %>%                         ## calculate weight 
+  select(age_group, income_group, weight)
+```
+
+
+```{r}
+## add on weights 
+sample_data <- sample_data %>% 
+  left_join(poststrat_weights, by = c("age_group", "income_group"))
+```
+
+
+Exercise 1 questions
+
+1. After weighting to match population proportions, does our weight average increase or decrease compared to unweighted average?  
+
+
+```{r}
+# sample_data %>% 
+#   summarize(coffee_consumption_avg = mean(coffee_consumption),
+#             coffee_consumption_avg_weight = mean(coffee_consumption * weight))
+```
+
+
+2. Do we trust our new weighted estimates? What things might we still not be capturing? 
+
+
+
+
+## Exerise 2
+
+
+We are trying to develop a new method for estimating mortality rates using the network survival method. We have collected a non-probability sample. 

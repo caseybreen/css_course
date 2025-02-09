@@ -1,5 +1,5 @@
 ---
-title: "Topics in Computational Social Science - Lab 1"
+title: "Topics in Computational Social Science - Lab "
 author: ""
 date: "`r format(Sys.Date(), '%d %B %Y')`"
 format: html
@@ -8,237 +8,491 @@ editor: visual
 
 ## Lab 2: Machine Learning and Prediction
 
-In this lab, we will cover the basic of prediction machine learning.
+In this lab, we will cover the basics of fitting a machine learning, test-train splits, and model performance metrics. For background on machine learning in the social sciences, please see:
 
-In exercise 1, we will simulate some data and practice fitting and assessing the performance of a simple linear regression and random forest, a popular machine learning algorithm. For background on machine learning in the social sciences, please see:
-
-Next, we'll apply machine learning to a real-world problem: estimating digital adoption.
+-   Molina, Mario, and Filiz Garip. 2019. ‘Machine Learning for Sociology’. Annual Review of Sociology 45(1):27–45. [doi: 10.1146/annurev-soc-073117-041106.](https://www.annualreviews.org/content/journals/10.1146/annurev-soc-073117-041106)
+-   Kapoor, Sayash, Emily Cantrell, Kenny Peng, Thanh Hien Pham, Christopher A. Bail, Odd Erik Gundersen, Jake M. Hofman, Jessica Hullman, Michael A. Lones, Momin M. Malik, Priyanka Nanayakkara, Russell A. Poldrack, Inioluwa Deborah Raji, Michael Roberts, Matthew J. Salganik, Marta Serra-Garcia, Brandon M. Stewart, Gilles Vandewiele, and Arvind Narayanan. 2023. ‘REFORMS: Reporting Standards for Machine Learning Based Science’. [doi: 10.1126/sciadv.adk3452.](https://pubmed.ncbi.nlm.nih.gov/38691601/)
 
 ## Exercise 1
 
-In this exercise, we'll simulate some data. Simulating data can be a helpful way of building intuition.
+In exercise 1, we'll simulate some data and practice fitting and assessing the performance of models. We'll fit a standard ordinary least squares (OLS) regression model and random forest model (one of the most popular machine learning algorithms).
 
-First, we'll load in all the packages we'll need for the analysis.
+Simulating data can be a helpful way of building intuition for machine learning concepts. When we simulate data, we can control the specific relationship between the features/predictors and the outcome.
+
+Here, we'll investigate the (hypothetical) association between coffee consumption and stress. Before we get started, we'll load in all the packages we'll need for the analysis.
 
 ```{r}
+## library package 
 library(tidyverse)     ## tidyverse 
 library(tidymodels)    ## machine learning package 
 library(cowplot)       ## pretty plots 
+
+## set seed for reproducibility 
+set.seed(47)
 ```
 
-Next, we'll set a seed. This ensures that our results are reproducible. A **seed** is an initial value used by a random number generator to produce a sequence of pseudo-random numbers. Setting a seed ensures that the same sequence of random numbers is generated every time the code is run, making results reproducible and consistent across different runs.
+We also set a seed for this analysis. This ensures that our results are reproducible. A **seed** is an initial value used by a random number generator to produce a sequence of pseudo-random numbers. Setting a seed ensures that the same sequence of random numbers is generated every time the code is run, making results reproducible and consistent across different runs.
 
-To simulate the data, we'll use a few helpful functions: \
+### Simulating data
+
+To simulate the data, we'll use a few helpful functions:
 
 -   `runif` creates n draws from uniform distribution between min and max
 
 -   `rnorm` creates n draws with a given mean and standard deviation
 
+We'll create a predictor variable (in machine learning language, a "feature") called `coffee`. This will correspond to cups of coffee drank in a given day.
+
+We'll then create a outcome variable `stress` that is a related to coffee in a non-linear fashion. We'll combine these two variables together into one data.frame.
+
 ```{r}
-set.seed(42)
-
-## linear data 
-coffee_linear = runif(n = 5000, min = 20, max = 60) ## create 5,000 draws from uniform distn 
-stress_linear = coffee_linear + rnorm(n = 5000, mean = 0, sd = 3) ## 
-
 ## non-linear data 
-coffee_nonlinear = runif(5000, 20, 60)
-stress_nonlinear = sin(coffee_nonlinear*0.75)*10 + coffee_nonlinear + rnorm(5000, 0, 3)
+coffee = runif(5000, 0, 5)
+stress = ((2 * coffee^2) - (7 * coffee) + 10 + rnorm(5000, 0, 1))/2.6  ## quadratic relationship with some noise from rnorm function 
 
 ## create a linear data frame and a non-linear dataframe 
-sim_data_linear <- data.frame(x = coffee_linear, y = stress_linear)
-sim_data_nonlinear <- data.frame(x = coffee_nonlinear, y = stress_nonlinear)
+sim_data <- data.frame(coffee, stress)
 ```
 
-## Exploratory data analysis
+### Exploratory data analysis
 
-The first thing that you want to do when you get new data is visualize it.
+The first thing that you want to do when you get new data is exploratory data analysis. The primary goal of exploratory data analysis is to take a first pass at detecting patterns, spot anomalies/outliers,and summarize key characteristics. The best way to start is often through **visualization**.
 
 ```{r}
-## plot linear relationship 
-ggplot(sim_data_linear, aes(x = x, y = y)) +
-  geom_point(alpha = 0.2) +
-  labs(
-    title = "Linear relationship",
-    x = "X",
-    y = "Y"
-  ) +
-  theme_bw() 
-
 ## plot non-linear relationship 
-ggplot(sim_data_nonlinear, aes(x = x, y = y)) +
+ggplot(sim_data, aes(x = coffee, y = stress)) +
   geom_point(alpha = 0.2) +
-  labs(
-    title = "Non-Linear Data",
-    x = "x",
-    y = "y"
-  ) +
-  theme_bw() 
+  theme_cowplot() + 
+  labs(x = "Cofffee (cups)",
+       y = "Stress (units)")
 ```
 
-You've been tasked with training a model to predict the relationship between coffee consumption and productivity in both world A (linear) and world B (non-linear). You're interested in how well your models perform.
+### Sample splitting
 
-To assess this, we are going to split into a training dataset and a test dataset.
+In machine learning, sample splitting is a key step to ensure that models generalize well to unseen data. The simplest sample splitting is a test-train split. Recall from lecture:
+
+-   The training set is used to fit the model
+-   The testing set evaluates how well the model performs on unseen data
+
+This helps prevent overfitting, where a model performs well on training data but poorly on new data.
+
+To split the sample, we can use the `initial_split()` function from the `rsample` package. This will automatically randomly split the data into a training partition and a test partition according to the proportions we give the function as arguments.
 
 ```{r}
 ## split into two folds (partitions)
-sim_data_linear_split <- initial_split(sim_data_linear, prop = .75)
-sim_data_nonlinear_split <- initial_split(sim_data_nonlinear, prop = .75)
+sim_data_split <- initial_split(sim_data, prop = .75)
 
 ## split into a train-test sample 
-train_linear_data <- training(sim_data_linear_split)
-test_linear_data <- testing(sim_data_linear_split)
-
-## split into a nonlinear train-test sample 
-train_nonlinear_data <- training(sim_data_nonlinear_split)
-test_nonlinear_data <- testing(sim_data_nonlinear_split)
+sim_data_train <- training(sim_data_split) 
+sim_data_test <- testing(sim_data_split)
 ```
 
 ## Simple Ordinary Least Squares (OLS) Regression Model
 
-First, we'll try fitting an OLS model. This is often the best place to start!
+First, we'll try fitting an OLS regression model (linear regression). Simple models like OLS are easy to interpret and are often a great place to start for any analysis. We'll fit a model of the form:
+
+$$\hat{Y} = \beta_0 + \beta_1 X + \varepsilon$$
+
+Where:
+
+-   $\hat{Y}$ represents the predicted *stress*
+
+-   $\beta_0$ is the intercept
+
+-   $\beta_1$ is the coefficient for *cups of coffee*
+
+-   $X$ is the \\texttt{coffee} variable,
+
+-   $\varepsilon$ represents the error term
+
+They can also serve as a helpful benchmark to help you understand how much better your more complex machine learning algorithms are doing than a simple model.
 
 ```{r}
 # Fit models
-model1 <- lm(x ~ y, data = train_linear_data)
-model2 <- lm(x ~ y, data = train_nonlinear_data)
+model_linear <- lm(stress ~ coffee, data = sim_data_train)
+
+## print out summary of linear model 
+summary(model_linear)
 
 # Predict on the test datasets
-predictions_linear <- predict(model1, newdata = test_linear_data)
-predictions_nonlinear <- predict(model2, newdata = test_nonlinear_data)
-
-# Add predictions to the test datasets
-test_linear_data <- test_linear_data %>% mutate(predicted = predictions_linear)
-test_nonlinear_data <- test_nonlinear_data %>% mutate(predicted = predictions_nonlinear)
+predicted_stress <- predict(model_linear, sim_data_test)
 ```
 
-## Comparing Model Performance
+**Understanding check:** What is the intercept telling us? What is the coefficient for coffee telling us? Are the coefficients significant? Do significant coefficients tell us anything about model performance?
 
-There are several model performance metrics. We'll calculate a few popular error metrics.
+### Model Performance Metrics
 
--   mean absolute error (MAE)
--   mean squared error (MSE)
--   R-squared ($R^2$)
+To assess the performance of our model, we'll use several different metrics.
 
-$$
-\text{MAE} = \frac{1}{n} \sum_{i=1}^n |y_i - \hat{y}_i|
-$$ $$
-\text{MSE} = \frac{1}{n} \sum_{i=1}^n (y_i - \hat{y}_i)^2
-$$
+#### Mean Absolute Error (MAE)
+
+MAE measures the average absolute differences between actual and predicted values:
 
 $$
-R^2 = 1 - \frac{\sum_{i=1}^n (y_i - \hat{y}_i)^2}{\sum_{i=1}^n (y_i - \bar{y})^2}$$
+\text{MAE} = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i|
+$$
+
+It provides an intuitive measure of the magnitude of error, treating all deviations equally.
+
+#### Mean Squared Error (MSE)
+
+MSE squares the errors before averaging, making it more sensitive to large deviations:
+
+$$
+\text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
+$$
+
+This metric is widely used and penalizes large errors more than smaller ones.
+
+#### R-squared ($R^2$)
+
+$R^2$ quantifies how well the model explains variance in the dependent variable:
+
+$$
+R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2}
+$$
+
+where $\bar{y}$ is the mean of the observed values. Higher values indicate a better fit, with $R^2 = 1$ representing a perfect model and $R^2 = 0$ representing a model doing no better than predicing mean of outcome variable.
+
+Each metric provides different information. MAE is simple to interpret, MSE places a larger penalty on larger errors (why might we want this?), and $R^2$ provides a simple metric of overall model fit.
+
+To assess model performance, we'll need to add our predictions onto our test data.
 
 ```{r}
-# Calculate accuracy metrics
-linear_mae <- mean(abs(test_linear_data$x - test_linear_data$predicted))
-nonlinear_mae <- mean(abs(test_nonlinear_data$x - test_nonlinear_data$predicted))
-
-# Calculate accuracy metrics
-linear_mse <- mean((test_linear_data$x - test_linear_data$predicted)^2)
-nonlinear_mse <- mean((test_nonlinear_data$x - test_nonlinear_data$predicted)^2)
-
-# R-squared for linear model
-linear_r_squared <- 1 - (sum((test_linear_data$x - test_linear_data$predicted)^2) / 
-                         sum((test_linear_data$x - mean(test_linear_data$x))^2))
-
-# R-squared for nonlinear model
-nonlinear_r_squared <- 1 - (sum((test_nonlinear_data$x - test_nonlinear_data$predicted)^2) / 
-                            sum((test_nonlinear_data$x - mean(test_nonlinear_data$x))^2))
-
-# Print results
-# Organise metrics into a data frame
-results <- data.frame(
-  Model = c("Linear (LM) ", "Nonlinear (LM)"),
-  MAE = c(linear_mae, nonlinear_mae),
-  MSE = c(linear_mse, nonlinear_mse),
-  R_squared = c(linear_r_squared, nonlinear_r_squared)
-)
-
-results
-
+## add predictions onto test (hold-out) data 
+sim_data_test_w_predictions <- sim_data_test %>% 
+  mutate(predicted_stress = predicted_stress)
 ```
+
+Now, let's visualize our errors in a calibration plot, which allows us to directly compare the predicted vs. actual values and analyze residuals.
+
+```{r}
+sim_data_test_w_predictions %>% 
+  ggplot(aes(x = stress, y = predicted_stress)) +
+  geom_point() + 
+  theme_cowplot() + 
+  ylim(0, 20) + 
+  geom_abline(color = "red", linetype = "dashed") 
+```
+
+## Calculate model performance metrics
+
+We'll write a few functions to try to predict
+
+If our predictions were perfect, they would lie along the red dashed line at 45 degrees. Here, we see lots of deviations away from this line... visually, it looks like our model could be improved!
+
+To more formally assess the performance of our model, we'll calculate the three error metrics calculate introduced above. We'll write functions to calculate these error metrics. Spend a little bit of time following the logic of each function and making sure it's correct.
+
+```{r}
+# Function to compute Mean Absolute Error (MAE)
+mae <- function(actual, predicted) {
+  mean(abs(actual - predicted))
+}
+
+# Function to compute Mean Squared Error (MSE)
+mse <- function(actual, predicted) {
+  mean((actual - predicted)^2)
+}
+
+# Function to compute R-squared (R²)
+r_squared <- function(actual, predicted) {
+  ss_total <- sum((actual - mean(actual))^2)
+  ss_residual <- sum((actual - predicted)^2)
+  1 - (ss_residual / ss_total)
+}
+```
+
+Let's calculate the functions we just create to calculate our three different model performance metrics for our linear model:
+
+```{r}
+sim_data_test_w_predictions %>% 
+  summarize(mse = mse(stress, predicted_stress),
+            mae = mae(stress, predicted_stress),
+            r_squared = r_squared(stress, predicted_stress))
+```
+
+The model isn't doing terribly here — the $R^2$ value tells use that 53% of the variance is explained by the model (but 47% is not).
+
+## Machine learning - Random forest
+
+Random Forest, a powerful ensemble learning method that improves prediction accuracy by combining multiple decision trees.
+
+At a high level, Random Forest works by:
+
+1.  Creating multiple decision trees using different random subsets of the training data.
+2.  Averaging predictions across trees (for regression) to make a final predictions.
+3.  Reducing overfitting by ensuring that individual trees don’t rely too heavily on any single feature or pattern in the data.
+
+Random Forest is particularly useful for handling nonlinear relationships (like ours!), high-dimensional datasets (many features), and noisy data. Here, we’ll use it to model the relationship between coffee and stress, and evaluate whether it improves predictive accuracy compared to our linear model.
+
+To fit the model, we'll use the `tidymodel` package. This is a well-maintained modern framework in R for streamlining machine learning workflows.
+
+Here, we'll first specify the *hyperparameters* our random forest model. Hyperparameters are configurable settings that control how a machine learning model learns. These have to be specified in advance and not learned from the data. Here's the hyperparameters we'll use:
+
+-   mtry = 1: Only one predictor is considered for each split (we only have 1 predictor).
+-   trees = 500: The model builds 500 decision trees for better averaging.
+-   min_n = 5: Each terminal node must have at least 5 observations.
+
+We'll set the engine using Ranger, which is an implementation of Random Forest. We'll also specify that this is a regression problem (predicting continuous outcome) and not a classification problem (predicting categorical or binary outcome).
 
 ```{r}
 # Define a random forest model specification
-rf_spec <- rand_forest(mtry = 2, trees = 500, min_n = 5) %>%
+rf_spec <- rand_forest(mtry = 1, trees = 500, min_n = 5) %>%
   set_engine("ranger") %>%
   set_mode("regression")
 
-# Fit the random forest model on the linear dataset
-rf_fit_linear <- rf_spec %>%
-  fit(x ~ y, data = train_linear_data)
-
-# Fit the random forest model on the nonlinear dataset
-rf_fit_nonlinear <- rf_spec %>%
-  fit(x ~ y, data = train_nonlinear_data)
-
-# Predict on the test datasets
-rf_predictions_linear <- rf_fit_linear %>%
-  predict(new_data = test_linear_data)
-
-rf_predictions_nonlinear <- rf_fit_nonlinear %>%
-  predict(new_data = test_nonlinear_data)
-
-# Add predictions to the test datasets
-rf_test_linear_data <- test_nonlinear_data %>%
-  mutate(predicted = rf_predictions_linear$.pred)
-
-rf_test_nonlinear_data <- test_nonlinear_data %>%
-  mutate(predicted = rf_predictions_nonlinear$.pred)
-
+# Train the Random Forest model
+rf_fit <- rf_spec %>%
+  fit(stress ~ coffee, data = sim_data_train)
 ```
 
+Next, we'll use our random forest model to make predictions in our test dataset.
+
 ```{r}
-# Calculate accuracy metrics
-rf_linear_mae <- mean(abs(rf_test_linear_data$x - rf_test_linear_data$predicted))
-rf_nonlinear_mae <- mean(abs(rf_test_nonlinear_data$x - rf_test_nonlinear_data$predicted))
+## make predictions  
+sim_data_test_rf <- predict(rf_fit, new_data = sim_data_test) 
+ 
+# Rename predicted column
+sim_data_test_rf_predictions <- sim_data_test_rf %>%
+  bind_cols(sim_data_test) %>%         # Add actual values for comparison
+  rename(predicted_stress_rf = .pred) # Rename predictions to be normal 
+```
 
-rf_linear_mse <- mean((rf_test_linear_data$x - rf_test_linear_data$predicted)^2)
-rf_nonlinear_mse <- mean((rf_test_nonlinear_data$x - rf_test_nonlinear_data$predicted)^2)
+Let's make a calibration plot to compare how well our random forest predictions are doing out-of-sample.
 
-rf_linear_r_squared <- 1 - (sum((rf_test_linear_data$x - rf_test_linear_data$predicted)^2) / 
-                            sum((rf_test_linear_data$x - mean(rf_test_linear_data$x))^2))
+```{r}
+sim_data_test_rf_predictions %>% 
+  ggplot(aes(x = stress, y = predicted_stress_rf)) +
+  geom_point() + 
+  theme_cowplot() + 
+  geom_abline(color = "red", linetype = "dashed")
+```
 
-rf_nonlinear_r_squared <- 1 - (sum((rf_test_nonlinear_data$x - rf_test_nonlinear_data$predicted)^2) / 
-                               sum((rf_test_nonlinear_data$x - mean(rf_test_nonlinear_data$x))^2))
+This quick visual inspection suggestions that our random forest model is performing much better than our linear regression! Let's investigate this more formally...
 
-# Organise metrics into a renamed data frame
-rf_results <- data.frame(
-  Model = c("Linear (Random Forest)", "Nonlinear (Random Forest)"),
-  MAE = c(rf_linear_mae, rf_nonlinear_mae),
-  MSE = c(rf_linear_mse, rf_nonlinear_mse),
-  R_squared = c(rf_linear_r_squared, rf_nonlinear_r_squared)
+## Exercise 1 questions:
+
+1.1 Using our model performance functions from above, calculate for the random forest algorithm in the training data:
+
+(i) Mean Absolute Error (MAE)
+(ii) Mean Squared Error (MSE)
+(iii) $R^2$ (Coefficient of Determination)
+
+1.2 Does random forest model or linear regression model have better predictive accuracy? Compare their MAE, MSE, and $R^2$. Does it matter which error metric we use?
+
+1.3 Bias in machine learning refers to the systematic deviation of model predictions from the true values. A model is considered biased if it consistently overestimates or underestimates the actual values. To formally assess bias, we compute the average prediction error (mean residual):
+
+$$ 
+\text{Bias} = \frac{1}{n} \sum_{i=1}^{n} (\hat{y}_i - y_{\text{true}, i})
+$$ Write a function to calculate bias (hint: adopt the mean absolute error function). Apply this function to predictions from both the linear model and random forest model. Do either of the models systematically over- or under-predict?
+
+# Exercise 2 - Predicting Subnational Internet Adoption
+
+In Exercise 2, we will train and evaluate a Random Forest regression model to predict internet adoption among women aged 15–49 at the first administrative level (e.g., state). We'll use real data (not simulated data). For each feature from derived from Facebook audience counts and geospatial data (e.g., night lights intensity). We'll use **cross-validation**, including **leave-one-country-out validation**, to evaluate how well our model generalizes.
+
+# ```{r}
+# data <- read_csv("~/workspace/dgg_subnational_code_release/data/master_data_file_jan16_with_national.csv")
+# ```
+# 
+# ```{r}
+# internet_df <- data  %>% 
+#   filter(!is.na(dhsyear)) %>% 
+#   dplyr::select(gid_1 = gadm,
+#          country,
+#          perc_used_internet_past12months_wght_age_15_to_49_wom,
+#          perc_used_internet_past12months_wght_age_15_to_49_fm_ratio,
+#          hdi_national = hdi,
+#          gdi_national = gdi, 
+#          subnational_gdi,
+#          subnational_hdi_females,
+#          subnational_hdi_males,
+#          nl_mean_zscore,
+#          pop_density_zscore,
+#          fb_pntr_18p_female,
+#          fb_pntr_18p_male,
+#          fb_pntr_18p_fm_ratio = fb_age_18_999_ratio,
+#          pop_density_zscore) %>% 
+#   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_fm_ratio))
+# 
+# 
+# internet_df %>% write_csv("~/Downloads/css_lab2_subnational_internet.csv")
+# ```
+
+```{r}
+internet_df <- read_csv("~/Downloads/css_lab2_subnational_internet.csv")
+```
+
+### Feature Definitions:
+
+It's important to understand what each variable (feature) in your dataset is telling you. Often there is a codebook or some other documentation available that provides descriptions of features along with other helpful information. This is a good place to start—sometime variables (features) aren't actually capturing what you would expect! Here's the descriptions of the features we have available in our dataset:
+
+-   `gid_1`: Subnational administrative unit identifier (from GADM, a global administrative boundaries database).
+-   `country`: Name of the country corresponding to the administrative unit.
+-   `perc_used_internet_past12months_wght_age_15_to_49_wom`: Percentage of women (ages 15–49) who used the internet in the past 12 months, weighted.
+-   `perc_used_internet_past12months_wght_age_15_to_49_fm_ratio`: Female-to-male ratio of internet usage among individuals aged 15–49, weighted.
+-   `hdi_national`: National-level composite measure of health, education, and standard of living.
+-   `gdi_national`: National-level Gender Development Index (GDI), measuring inequality with respect to life expectancy at birth, education, and expected years of schooling
+-   `subnational_gdi`: Subnational-level Gender Development Index
+-   `subnational_hdi_females`: Subnational composite measure of health, education, and standard of living for women
+-   `subnational_hdi_males`: Subnational composite measure of health, education, and standard of living for men
+-   `nl_mean_zscore`: Z-score of nighttime lights intensity, often used as a proxy for economic activity.
+-   `pop_density_zscore`: Z-score of population density, normalizing population per unit area.
+-   `fb_pntr_18p_female`: Facebook penetration rate among women aged 18+ (percentage of women on Facebook in the last month relative to population).
+-   `fb_pntr_18p_male`: Facebook penetration rate among men aged 18+ (percentage of women on Facebook in the last month relative to population).
+
+## Fit machine learning model 
+
+First, we'll split out data 
+
+```{r}
+## sgenerate train and test folds (partitions)
+internet_df_split <- initial_split(internet_df, prop = .75)
+
+## split into a train-test sample 
+internet_df_train <- training(internet_df_split) 
+internet_df_test <- testing(internet_df_split)
+
+## check number of observations in each dataset
+nrow(internet_df_train)/nrow(internet_df)
+nrow(internet_df_test)/nrow(internet_df)
+```
+
+Now we'll fit a random forest model again. We'll keep the same basic hyperparameters as above, but we'll use 3 features in each decision tree (mtry = 3). 
+
+For this model, we'll start with just three features:
+
+1. Nighttime lights data (`nl_mean_zscore`) – a proxy for economic activity.
+2. Facebook penetration among women (`fb_pntr_18p_female`) – an indicator of digital access.
+3. Subnational Human Development Index for females (`subnational_hdi_females`) – a measure of socioeconomic development.
+
+```{r}
+# Define a random forest model specification
+rf_spec <- rand_forest(mtry = 3, trees = 500, min_n = 5) %>%
+  set_engine("ranger") %>%
+  set_mode("regression")
+
+# Train the Random Forest model
+rf_fit_internet <- rf_spec %>%
+  fit(perc_used_internet_past12months_wght_age_15_to_49_wom ~ fb_pntr_18p_female + subnational_hdi_females + nl_mean_zscore,
+      data = internet_df_train)
+```
+
+Just to help build intuition, let's check our model performance metrics on the *training* data. 
+
+```{r}
+## make predictions and then 
+sim_data_test_w_rf_predictions <- predict(rf_fit_internet, new_data = internet_df_train) %>% 
+    bind_cols(internet_df_train)  # Add actual values for comparison
+
+model_performance_training <- sim_data_test_w_rf_predictions %>% 
+  summarize(mae = mae(.pred, perc_used_internet_past12months_wght_age_15_to_49_wom),
+            mse = mse(.pred, perc_used_internet_past12months_wght_age_15_to_49_wom),
+            r_squared = r_squared(.pred, perc_used_internet_past12months_wght_age_15_to_49_wom))
+
+model_performance_training
+```
+
+Our model performance here is amazing! So good, in fact, that we should be suspicious...remember, assessing model performance on the data we trained is highly misleading. 
+
+Let's check how things look when we assess model performance in the test data:
+
+```{r}
+## make predictions and then 
+sim_data_test_w_rf_predictions_test <- predict(rf_fit_internet, new_data = internet_df_test) %>% 
+    bind_cols(internet_df_test)  # Add actual values for comparison
+
+## calculate model performance metrics 
+model_performance_test <- sim_data_test_w_rf_predictions_test %>% 
+  summarize(mae = mae(.pred, perc_used_internet_past12months_wght_age_15_to_49_wom),
+            mse = mse(.pred, perc_used_internet_past12months_wght_age_15_to_49_wom), 
+            r_squared = r_squared(.pred, perc_used_internet_past12months_wght_age_15_to_49_wom))
+
+model_performance_test
+```
+
+Let's visualizes the difference in model performance metrics. As we would expect, our model performed way better in the training data than in the test data. 
+
+```{r}
+model_performance_combined <- model_performance_training %>%
+    mutate(set = "training") %>%
+    bind_rows(model_performance_test %>% mutate(set = "test")) %>%
+    pivot_longer(cols = -set, names_to = "metric", values_to = "value")
+
+model_performance_combined %>% 
+  ggplot(aes(x = set, y = value, fill = set)) + 
+  geom_col() + 
+  facet_wrap(~metric, scales = "free") + 
+  theme_cowplot() + 
+  theme(legend.position = "bottom")
+```
+
+## Cross-validation
+
+In traditional train-test splitting, a common limitation is that not all data points are used for both training and testing — this can lead to less efficient/reliable model evaluations. Cross-validation addresses this by ensuring that each observation is used in both training and validation phases, providing a more comprehensive assessment of the model's performance.
+
+The most common method is k-fold cross-validation, where the data is split into k parts (folds). The model is trained on k-1 folds and tested on the remaining fold. This process repeats k times, with each fold used for testing once. The results are averaged to the overall performance metric. 
+
+That's what we'll do here. First, we'll use the `vfold_cv` to generate 10 folds.
+
+```{r}
+## create folds 
+folds <- vfold_cv(internet_df, v = 10)
+folds
+```
+
+We'll then need to define our random forest model that we want to fit `rf_spec`. The key function we want to use is `fit_resamples()`, which evaluates the model's performance using k-fold cross-validation. 
+The function will fits the model to multiple subsets of the data and assesses its performance on corresponding test sets.
+
+We'll also have the function automatically calculate the three model performance metrics we're interested in. We will need to manually specify the error metrics in the `fit_resamples()` function. 
+
+```{r}
+# Define a random forest model specification (same as above)
+rf_spec <- rand_forest(mtry = 3, trees = 500, min_n = 5) %>%
+  set_engine("ranger") %>%
+  set_mode("regression")
+
+
+## Define a random forest specification 
+rf_res <- fit_resamples(
+  rf_spec,
+  perc_used_internet_past12months_wght_age_15_to_49_wom ~ fb_pntr_18p_female + subnational_hdi_females + nl_mean_zscore,
+  resamples = folds,
+  metrics = metric_set(yardstick::rmse, yardstick::mae, yardstick::rsq)
 )
-
-# Print the results
-print(rf_results)
 ```
 
-## Exercise 1:
+To access the error metric that were calculated by the `fit_resamples()` function, we can use the `collect_metrics()` function. 
 
 ```{r}
-# Plot for the linear dataset
-linear_plot <- rf_test_linear_data %>%
-  ggplot(aes(x = x, y = predicted)) +
-  geom_point(color = "blue", alpha = 0.6) +
-  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
-  labs(
-    title = "Real vs. Predicted Values: Linear Dataset (Random Forest)",
-    x = "Actual Values",
-    y = "Predicted Values"
-  ) +
-  theme_minimal()
+## get error metrics  
+error_metrics_10fold <- collect_metrics(rf_fit_rs)
 
-# Plot for the nonlinear dataset
-nonlinear_plot <- rf_test_nonlinear_data %>%
-  ggplot(aes(x = x, y = predicted)) +
-  geom_point(color = "green", alpha = 0.6) +
-  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
-  labs(
-    title = "Real vs. Predicted Values: Nonlinear Dataset (Random Forest)",
-    x = "Actual Values",
-    y = "Predicted Values"
-  ) +
-  theme_minimal()
+error_metrics_10fold %>% 
+  mutate(cv_method = "10-fold")
 ```
+Here, we're interested in the mean of the performance error metrics across folds. Our model appears to be performing reasonably well. 
+
+## Exercises 2 - questions 
+
+In our lab, we used standard 10-fold cross-validation. But perhaps we want to know how well our model would perform in countries we had no training data at all (e.g., not one of the 34 countries in our dataset). To replicate this scenario, we can employ leave-one-country-out cross-validation. In this approach, we iteratively exclude all subnational units from one country, train the model on subnational untis from the remaining countries, and then assess its performance on the excluded country's subnational units. This method evaluates the model's ability to generalize to unseen countries (assuming they are similar to the countries we have in our dataset). 
+
+2.1 Now let's try this except with leave-one-country-out cross-validation. Here, we'll split into folds based on country (rather than random).
+
+```{r}
+## hint: make new folds 
+folds <- group_vfold_cv(internet_df_train, group = country)
+folds
+```
+
+2.2 When we use leave-one-country-out cross-validation, does the model perform better or worse? Why would this be?
+
+2.3 Create a calibration plot with our observed (x-axis) and predicted (y-axis) values for both 10-fold cross-validation and leave-one-country-out cross-validation predictions.
+
+
+
+## Bonus exercise
+
+- How can we improve this k-fold model? Try playing around with adding additional features and/or changing the hyperparameters. What helped the most? 
+- With your best algorithm, what's the difference in $R^2$ as assessed using 10-fold cross-validation? As assessed using leave-one-country-out cross-validation? 
+- What real world data availability scenarios do leave-one-country cross-validation and 10-fold cross-validation correspond to?
+- What other features would you want to include to help improve the model's performance. 
