@@ -40,7 +40,7 @@ To simulate the data, we'll use a few helpful functions:
 
 -   `runif` generates $n$ draws from uniform distribution between a given min and max value
 
--   `rnorm` generates $n$ draws with a given mean and standard deviation
+-   `rnorm` generates $n$ draws from a normal distribution with a given mean and standard deviation
 
 We'll create a predictor variable (in machine learning language, a "feature") called `coffee`. This will correspond to cups of coffee consumed in a given day.
 
@@ -104,7 +104,7 @@ Where:
 
 -   $\beta_1$ is the coefficient for *cups of coffee*
 
--   $X$ is the \\texttt{coffee} variable,
+-   $X$ is the *coffee* variable,
 
 -   $\varepsilon$ represents the error term
 
@@ -155,7 +155,7 @@ $$
 R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2}
 $$
 
-where $\bar{y}$ is the mean of the observed values. Higher values indicate a better fit, with $R^2 = 1$ representing a perfect model and $R^2 = 0$ representing a model doing no better than predicing mean of outcome variable.
+where $\bar{y}$ is the mean of the observed values. Higher values indicate a better fit, with $R^2 = 1$ representing a perfect model and $R^2 = 0$ representing a model doing no better than predicting mean of outcome variable.
 
 Each metric provides different information. MAE is simple to interpret, RMSE places a larger penalty on larger errors (why might we want this?), and $R^2$ provides a simple metric of overall model fit.
 
@@ -296,7 +296,7 @@ Our dataset includes various subnational features, such as:
 
 -   The weighted proportion of men and women on Facebook
 
--   Geospatial indicators, such nightlight intensity
+-   Geospatial indicators, such nightlight intensity (a good proxy for level of economic development in a given area)
 
 To assess how well our model generalizes, we will use two different cross-validation strategies.
 
@@ -306,7 +306,7 @@ Download the `css_lab2_subnational_internet.csv` file from the canvas page and r
 
 ```{r}
 ## read in data 
-## you'll need to updat this path 
+## you'll need to update this path 
 internet_df <- read_csv("~/Downloads/css_lab2_subnational_internet.csv")
 ```
 
@@ -314,21 +314,21 @@ internet_df <- read_csv("~/Downloads/css_lab2_subnational_internet.csv")
 
 It's important to understand what each variable (feature) in your dataset is telling you. Often there is a codebook or some other documentation available that provides descriptions of features along with other helpful information. This is a good place to start—sometime variables (features) aren't actually capturing what you would expect!
 
-Here's the descriptions of the features we have available in our dataset:
+The dataset we are using here was created by the Digital Gender Gaps team by assembling data from various sources. Here's the descriptions of the features we have available in our dataset:
 
 -   `gid_1`: Subnational administrative unit identifier (from GADM, a global administrative boundaries database).
 -   `country`: Name of the country corresponding to the administrative unit.
--   `perc_used_internet_past12months_wght_age_15_to_49_wom`: Percentage of women (ages 15–49) who used the internet in the past 12 months, weighted.
--   `perc_used_internet_past12months_wght_age_15_to_49_fm_ratio`: Female-to-male ratio of internet usage among individuals aged 15–49, weighted.
--   `hdi_national`: National-level composite measure of health, education, and standard of living.
+-   `perc_used_internet_past12months_wght_age_15_to_49_wom`: Percentage of women (ages 15–49) who used the internet in the past 12 months, weighted (from Demographic and Health Surveys)
+-   `perc_used_internet_past12months_wght_age_15_to_49_fm_ratio`: Female-to-male ratio of internet usage among individuals aged 15–49, weighted (from Demographic and Health Surveys)
+-   `hdi_national`: National-level composite measure of health, education, and standard of living (from UNDP)
 -   `gdi_national`: National-level Gender Development Index (GDI), measuring inequality with respect to life expectancy at birth, education, and expected years of schooling
--   `subnational_gdi`: Subnational-level Gender Development Index
--   `subnational_hdi_females`: Subnational composite measure of health, education, and standard of living for women
+-   `subnational_gdi`: Subnational-level Gender Development Index (from Global Development Lab)
+-   `subnational_hdi_females`: Subnational composite measure of health, education, and standard of living for women (from Global Development Lab)
 -   `subnational_hdi_males`: Subnational composite measure of health, education, and standard of living for men
--   `nl_mean_zscore`: Z-score of nighttime lights intensity, often used as a proxy for economic activity.
--   `pop_density_zscore`: Z-score of population density, normalizing population per unit area.
--   `fb_pntr_18p_female`: Facebook penetration rate among women aged 18+ (percentage of women on Facebook in the last month relative to population).
--   `fb_pntr_18p_male`: Facebook penetration rate among men aged 18+ (percentage of women on Facebook in the last month relative to population).
+-   `nl_mean_zscore`: Z-score of nighttime lights intensity, often used as a proxy for economic activity (from NASA VIIRS)
+-   `pop_density_zscore`: Z-score of population density, normalizing population per unit area (from WorldPop team)
+-   `fb_pntr_18p_female`: Facebook penetration rate among women aged 18+ (percentage of women on Facebook in the last month relative to population) (from FB marketing API)
+-   `fb_pntr_18p_male`: Facebook penetration rate among men aged 18+ (percentage of women on Facebook in the last month relative to population) (from FB marketing API)
 
 ## Fit machine learning model
 
@@ -351,7 +351,7 @@ Now we'll fit a random forest model again. We'll keep the same number of trees a
 
 For this model, we'll start with just three features:
 
-1.  Night lights data (`nl_mean_zscore`) – a proxy for economic activity and overall development
+1.  Night lights data (`nl_mean_zscore`) – a proxy for economic activity and development
 2.  Facebook penetration among women (`fb_pntr_18p_female`) – an indicator of digital access
 3.  Subnational Human Development Index for females (`subnational_hdi_females`) – subnational composite measure of health, education, and standard of living for women
 

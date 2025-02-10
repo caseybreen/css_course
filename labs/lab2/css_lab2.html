@@ -157,10 +157,10 @@ window.Quarto = {
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)     <span class="do">## tidyverse </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ dplyr     1.1.4     ✔ readr     2.1.4
+✔ dplyr     1.1.4     ✔ readr     2.1.5
 ✔ forcats   1.0.0     ✔ stringr   1.5.1
 ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
-✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+✔ lubridate 1.9.4     ✔ tidyr     1.3.1
 ✔ purrr     1.0.2     
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
@@ -169,13 +169,13 @@ window.Quarto = {
 </div>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)    <span class="do">## machine learning package </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>── Attaching packages ────────────────────────────────────── tidymodels 1.1.1 ──
-✔ broom        1.0.5      ✔ rsample      1.2.0 
-✔ dials        1.2.1      ✔ tune         1.1.2 
-✔ infer        1.0.6      ✔ workflows    1.1.4 
-✔ modeldata    1.3.0      ✔ workflowsets 1.0.1 
-✔ parsnip      1.2.0      ✔ yardstick    1.3.1 
-✔ recipes      1.0.10     
+<pre><code>── Attaching packages ────────────────────────────────────── tidymodels 1.2.0 ──
+✔ broom        1.0.7     ✔ rsample      1.2.1
+✔ dials        1.3.0     ✔ tune         1.2.1
+✔ infer        1.0.7     ✔ workflows    1.1.4
+✔ modeldata    1.4.0     ✔ workflowsets 1.1.0
+✔ parsnip      1.2.1     ✔ yardstick    1.3.2
+✔ recipes      1.1.0     
 ── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──
 ✖ scales::discard() masks purrr::discard()
 ✖ dplyr::filter()   masks stats::filter()
@@ -183,7 +183,7 @@ window.Quarto = {
 ✖ dplyr::lag()      masks stats::lag()
 ✖ yardstick::spec() masks readr::spec()
 ✖ recipes::step()   masks stats::step()
-• Learn how to get started at https://www.tidymodels.org/start/</code></pre>
+• Use tidymodels_prefer() to resolve common conflicts.</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)       <span class="do">## pretty plots </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
@@ -205,7 +205,7 @@ The following object is masked from 'package:lubridate':
 <p>To simulate the data, we’ll use a few helpful functions:</p>
 <ul>
 <li><p><code>runif</code> generates <span class="math inline">\(n\)</span> draws from uniform distribution between a given min and max value</p></li>
-<li><p><code>rnorm</code> generates <span class="math inline">\(n\)</span> draws with a given mean and standard deviation</p></li>
+<li><p><code>rnorm</code> generates <span class="math inline">\(n\)</span> draws from a normal distribution with a given mean and standard deviation</p></li>
 </ul>
 <p>We’ll create a predictor variable (in machine learning language, a “feature”) called <code>coffee</code>. This will correspond to cups of coffee consumed in a given day.</p>
 <p>We’ll then create an outcome variable <code>stress</code> that is related to coffee in a non-linear fashion. We’ll combine these two variables together into one data.frame.</p>
@@ -266,7 +266,7 @@ The following object is masked from 'package:lubridate':
 <li><p><span class="math inline">\(\hat{Y}\)</span> represents the predicted <em>stress</em></p></li>
 <li><p><span class="math inline">\(\beta_0\)</span> is the intercept</p></li>
 <li><p><span class="math inline">\(\beta_1\)</span> is the coefficient for <em>cups of coffee</em></p></li>
-<li><p><span class="math inline">\(X\)</span> is the \texttt{coffee} variable,</p></li>
+<li><p><span class="math inline">\(X\)</span> is the <em>coffee</em> variable,</p></li>
 <li><p><span class="math inline">\(\varepsilon\)</span> represents the error term</p></li>
 </ul>
 <p>They can also serve as a helpful benchmark to help you understand how much better more complex machine learning algorithms are doing than a simple model.</p>
@@ -325,7 +325,7 @@ F-statistic:  4703 on 1 and 3748 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p><span class="math display">\[
 R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2}
 \]</span></p>
-<p>where <span class="math inline">\(\bar{y}\)</span> is the mean of the observed values. Higher values indicate a better fit, with <span class="math inline">\(R^2 = 1\)</span> representing a perfect model and <span class="math inline">\(R^2 = 0\)</span> representing a model doing no better than predicing mean of outcome variable.</p>
+<p>where <span class="math inline">\(\bar{y}\)</span> is the mean of the observed values. Higher values indicate a better fit, with <span class="math inline">\(R^2 = 1\)</span> representing a perfect model and <span class="math inline">\(R^2 = 0\)</span> representing a model doing no better than predicting mean of outcome variable.</p>
 <p>Each metric provides different information. MAE is simple to interpret, RMSE places a larger penalty on larger errors (why might we want this?), and <span class="math inline">\(R^2\)</span> provides a simple metric of overall model fit.</p>
 <p>To assess model performance, we’ll need to add our predictions onto our test data.</p>
 <div class="cell">
@@ -463,7 +463,7 @@ R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y
 <p>Our dataset includes various subnational features, such as:</p>
 <ul>
 <li><p>The weighted proportion of men and women on Facebook</p></li>
-<li><p>Geospatial indicators, such nightlight intensity</p></li>
+<li><p>Geospatial indicators, such nightlight intensity (a good proxy for level of economic development in a given area)</p></li>
 </ul>
 <p>To assess how well our model generalizes, we will use two different cross-validation strategies.</p>
 <section id="read-in-real-data" class="level3">
@@ -471,7 +471,7 @@ R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y
 <p>Download the <code>css_lab2_subnational_internet.csv</code> file from the canvas page and read it in using the <code>read_csv</code> package.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="do">## read in data </span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="do">## you'll need to updat this path </span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="do">## you'll need to update this path </span></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>internet_df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/Downloads/css_lab2_subnational_internet.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 570 Columns: 14
@@ -488,21 +488,21 @@ dbl (12): perc_used_internet_past12months_wght_age_15_to_49_wom, perc_used_i...
 <section id="feature-definitions" class="level3">
 <h3 class="anchored" data-anchor-id="feature-definitions">Feature Definitions</h3>
 <p>It’s important to understand what each variable (feature) in your dataset is telling you. Often there is a codebook or some other documentation available that provides descriptions of features along with other helpful information. This is a good place to start—sometime variables (features) aren’t actually capturing what you would expect!</p>
-<p>Here’s the descriptions of the features we have available in our dataset:</p>
+<p>The dataset we are using here was created by the Digital Gender Gaps team by assembling data from various sources. Here’s the descriptions of the features we have available in our dataset:</p>
 <ul>
 <li><code>gid_1</code>: Subnational administrative unit identifier (from GADM, a global administrative boundaries database).</li>
 <li><code>country</code>: Name of the country corresponding to the administrative unit.</li>
-<li><code>perc_used_internet_past12months_wght_age_15_to_49_wom</code>: Percentage of women (ages 15–49) who used the internet in the past 12 months, weighted.</li>
-<li><code>perc_used_internet_past12months_wght_age_15_to_49_fm_ratio</code>: Female-to-male ratio of internet usage among individuals aged 15–49, weighted.</li>
-<li><code>hdi_national</code>: National-level composite measure of health, education, and standard of living.</li>
+<li><code>perc_used_internet_past12months_wght_age_15_to_49_wom</code>: Percentage of women (ages 15–49) who used the internet in the past 12 months, weighted (from Demographic and Health Surveys)</li>
+<li><code>perc_used_internet_past12months_wght_age_15_to_49_fm_ratio</code>: Female-to-male ratio of internet usage among individuals aged 15–49, weighted (from Demographic and Health Surveys)</li>
+<li><code>hdi_national</code>: National-level composite measure of health, education, and standard of living (from UNDP)</li>
 <li><code>gdi_national</code>: National-level Gender Development Index (GDI), measuring inequality with respect to life expectancy at birth, education, and expected years of schooling</li>
-<li><code>subnational_gdi</code>: Subnational-level Gender Development Index</li>
-<li><code>subnational_hdi_females</code>: Subnational composite measure of health, education, and standard of living for women</li>
+<li><code>subnational_gdi</code>: Subnational-level Gender Development Index (from Global Development Lab)</li>
+<li><code>subnational_hdi_females</code>: Subnational composite measure of health, education, and standard of living for women (from Global Development Lab)</li>
 <li><code>subnational_hdi_males</code>: Subnational composite measure of health, education, and standard of living for men</li>
-<li><code>nl_mean_zscore</code>: Z-score of nighttime lights intensity, often used as a proxy for economic activity.</li>
-<li><code>pop_density_zscore</code>: Z-score of population density, normalizing population per unit area.</li>
-<li><code>fb_pntr_18p_female</code>: Facebook penetration rate among women aged 18+ (percentage of women on Facebook in the last month relative to population).</li>
-<li><code>fb_pntr_18p_male</code>: Facebook penetration rate among men aged 18+ (percentage of women on Facebook in the last month relative to population).</li>
+<li><code>nl_mean_zscore</code>: Z-score of nighttime lights intensity, often used as a proxy for economic activity (from NASA VIIRS)</li>
+<li><code>pop_density_zscore</code>: Z-score of population density, normalizing population per unit area (from WorldPop team)</li>
+<li><code>fb_pntr_18p_female</code>: Facebook penetration rate among women aged 18+ (percentage of women on Facebook in the last month relative to population) (from FB marketing API)</li>
+<li><code>fb_pntr_18p_male</code>: Facebook penetration rate among men aged 18+ (percentage of women on Facebook in the last month relative to population) (from FB marketing API)</li>
 </ul>
 </section>
 <section id="fit-machine-learning-model" class="level2">
@@ -529,7 +529,7 @@ dbl (12): perc_used_internet_past12months_wght_age_15_to_49_wom, perc_used_i...
 <p>Now we’ll fit a random forest model again. We’ll keep the same number of trees and tree depth as above (these are standard), but we’ll now use 3 features in each decision tree (mtry = 3).</p>
 <p>For this model, we’ll start with just three features:</p>
 <ol type="1">
-<li>Night lights data (<code>nl_mean_zscore</code>) – a proxy for economic activity and overall development</li>
+<li>Night lights data (<code>nl_mean_zscore</code>) – a proxy for economic activity and development</li>
 <li>Facebook penetration among women (<code>fb_pntr_18p_female</code>) – an indicator of digital access</li>
 <li>Subnational Human Development Index for females (<code>subnational_hdi_females</code>) – subnational composite measure of health, education, and standard of living for women</li>
 </ol>
