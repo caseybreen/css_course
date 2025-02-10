@@ -6,29 +6,29 @@ format: html
 editor: visual
 ---
 
-## Lab 3: Non-probability sa
+## Lab 3: Non-probability sampling 
 
-In this lab, we will cover a basic example of non-probability sampling 
+In this lab, we will explore different methods for adjusting non-probability samples to better estimate population-level statistics. Non-probability sampling is increasingly common in data collection and, in some cases, the only feasible approach for reaching certain populations (hard-to-reach). For an overview of non-probability sampling in the social sciences, see:
 
-In exercise 1, use some simulate data and do a basic. 
+* Baker, Reg, J. Michael Brick, Nancy A. Bates, Mike Battaglia, Mick P. Couper, Jill A. Dever, Krista J. Gile, and Roger Tourangeau. 2013. ‘Summary Report of the AAPOR Task Force on Non-Probability Sampling’. Journal of Survey Statistics and Methodology 1(2):90–143. doi: 10.1093/jssam/smt008.
 
-In exercise2 , we'll use a network based method (network survival) to estimate mortality rates. We'll use real data for this exercise. 
+* Kennedy, Andrew Mercer, Arnold Lau and Courtney. 2018. ‘For Weighting Online Opt-In Samples, What Matters Most?’ Pew Research Center. Retrieved 10 February 2025 (https://www.pewresearch.org/methods/2018/01/26/for-weighting-online-opt-in-samples-what-matters-most/).
 
+In the first exercise, we will use simulated data to examine how different weighting techniques affect estimates from non-probability samples. This will help us understand the role of weighting adjustments in improving the representativeness of such samples.
 
 ## Exercise 1
 
-
-In this exercise, we'll calculate basic post-stratification weights based on a sample of coffee drinkers. This convenience sample was 
-
+In this exercise, we'll calculate basic post-stratification weights based on a simulated sample of coffee drinkers. This convenience sample of coffee drinkers was taken at a coffee shop. We've obtained city-level data on people aged 18+ that we can use to reweight on  age and income. 
 
 ```{r}
+## library packages 
 library(tidyverse)
 ```
 
-
-First, we'll read in some data 
+First, we'll load our simulated data. 
 
 ```{r}
+## read in sample data 
 sample_data <- data.frame(
                   id = 1:20,
            age_group = c("50+","50+","30-49",
@@ -43,17 +43,16 @@ sample_data <- data.frame(
                          2.6,2.7,1.2,3.5,2.4,3.5,3.7,4,2.4,3.5,1.3,2.2,
                          2.1,0.6,3))
 
-
+## read in sample proportion data 
 sample_proportion <- sample_data %>% 
   count(age_group, income_group) %>% 
   mutate(sample_proportion = n / sum(n))
 ```
 
-
-
-Let's assume we have the real population proportions. 
+We'll also read in our auxiliary data from the city on the true porportion of people in each group. 
 
 ```{r}
+## read in auxiliary population proportions 
 pop_proportion <- data.frame(
   pop_proportion = c(0.12, 0.2, 0.08, 0.1, 0.25, 0.05, 0.05, 0.1, 0.05),
   age_group = c("18-29",
@@ -65,6 +64,16 @@ pop_proportion <- data.frame(
 ```
 
 
+## Calculating weights 
+
+Post-stratification weighting is a technique used to correct for discrepancies between a sample and the true population distribution. In our case,  merge sample proportions from our convenience sample taken at a coffee shop with known population proportions based on shared characteristics such as age group and income group. It's key that your sample collects the same information as is available in the auxiliary population data. 
+
+By calculating the inclusion probability (the ratio of the sample proportion to the population proportion), we can determine how over- or underrepresented each group is in the sample. The weight for each group is then computed as the inverse of this probability; this ensures that underrepresented groups receive higher weights while overrepresented groups receive lower ones. This process helps adjust for biases that arise in non-probability samples, making our estimates more representative of the population.
+
+Once the weights are calculated, they are merged back into the sample dataset so that each person is assigned a weight based on their demographic characteristics. These weights have simple explanation: they represent how much each individual in the sample should "count" in order to make the sample more representative of the overall population. A person in an overrepresented group will have a weight smaller than 1, meaning their influence on estimates is reduced, while someone in an underrepresented group will have a weight greater than 1, increasing their influence on final statistics. 
+
+We'll first calculate probability inclusion for each person in cells cross-classified by age and gender
+
 ```{r}
 ## join population proportions together 
 poststrat_weights <- sample_proportion %>% 
@@ -74,33 +83,43 @@ poststrat_weights <- sample_proportion %>%
   select(age_group, income_group, weight)
 ```
 
+Next, we'll use the sample data to construct post-stratifiation weights. 
 
 ```{r}
 ## add on weights 
-sample_data <- sample_data %>% 
+sample_data_weighted <- sample_data %>% 
   left_join(poststrat_weights, by = c("age_group", "income_group"))
 ```
 
-
 Exercise 1 questions
 
-1. After weighting to match population proportions, does our weight average increase or decrease compared to unweighted average?  
-
+1.  After weighting to match population proportions, does our weight average increase or decrease compared to unweighted average?
 
 ```{r}
-# sample_data %>% 
+# sample_data_weighted %>% 
 #   summarize(coffee_consumption_avg = mean(coffee_consumption),
 #             coffee_consumption_avg_weight = mean(coffee_consumption * weight))
 ```
 
-
-2. Do we trust our new weighted estimates? What things might we still not be capturing? 
+2.  Do we trust our new weighted estimates? What things might our poststratification weights not be capturing?
 
 
 ## Exerise 2
 
 
-We are trying to develop a new method for estimating mortality rates using the network survival method. We have collected a non-probability sample. The challenge with this non-probability sample is taht 
+Scenario: We are developing a new method for estimating mortality rates in humanitarian emergencies using the network survival method. This approach relies on a non-probability sample, which presents challenges in ensuring that our estimates accurately reflect the broader population. In real conflict settings, researchers often face significant barriers to collecting truly random samples, making non-probability approaches necessary. In most humanitarian emergencies (hurricanes, civil wars, etc.) we can't just send enumerators around to to conduct a probability sample! 
+
+To imitate this setting, we have collected read data fom high-mortality conflict zone: Tanganyika province in the Democratic Republic of the Congo (DRC). The dataset comes from a quota sample drawn from key local hubs, including taxi stations, ports, markets, and hospitals. To improve estimation accuracy, we will apply different weighting techniques, including post-stratification and inverse-probability weighting, to adjust for potential biases in the sample and refine our mortality estimates.
+
+
+
+
+
+
+
+
+
+
 
 
 
