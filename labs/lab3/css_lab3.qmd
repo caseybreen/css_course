@@ -97,9 +97,11 @@ Exercise 1 questions
 2. Do we trust our new weighted estimates? What things might we still not be capturing? 
 
 
-
-
 ## Exerise 2
 
 
-We are trying to develop a new method for estimating mortality rates using the network survival method. We have collected a non-probability sample. 
+We are trying to develop a new method for estimating mortality rates using the network survival method. We have collected a non-probability sample. The challenge with this non-probability sample is taht 
+
+
+
+
