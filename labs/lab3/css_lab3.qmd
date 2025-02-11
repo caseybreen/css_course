@@ -6,26 +6,27 @@ format: html
 editor: visual
 ---
 
-## Lab 3: Non-probability sampling 
+## Lab 3: Non-probability sampling
 
 In this lab, we will explore different methods for adjusting non-probability samples to better estimate population-level statistics. Non-probability sampling is increasingly common in data collection and, in some cases, the only feasible approach for reaching certain populations (hard-to-reach). For an overview of non-probability sampling in the social sciences, see:
 
-* Baker, Reg, J. Michael Brick, Nancy A. Bates, Mike Battaglia, Mick P. Couper, Jill A. Dever, Krista J. Gile, and Roger Tourangeau. 2013. ‘Summary Report of the AAPOR Task Force on Non-Probability Sampling’. Journal of Survey Statistics and Methodology 1(2):90–143. doi: 10.1093/jssam/smt008.
+-   Baker, Reg, J. Michael Brick, Nancy A. Bates, Mike Battaglia, Mick P. Couper, Jill A. Dever, Krista J. Gile, and Roger Tourangeau. 2013. ‘Summary Report of the AAPOR Task Force on Non-Probability Sampling’. Journal of Survey Statistics and Methodology 1(2):90–143. doi: 10.1093/jssam/smt008.
 
-* Kennedy, Andrew Mercer, Arnold Lau and Courtney. 2018. ‘For Weighting Online Opt-In Samples, What Matters Most?’ Pew Research Center. Retrieved 10 February 2025 (https://www.pewresearch.org/methods/2018/01/26/for-weighting-online-opt-in-samples-what-matters-most/).
+-   Kennedy, Andrew Mercer, Arnold Lau and Courtney. 2018. ‘For Weighting Online Opt-In Samples, What Matters Most?’ Pew Research Center. Retrieved 10 February 2025 (https://www.pewresearch.org/methods/2018/01/26/for-weighting-online-opt-in-samples-what-matters-most/).
 
 In the first exercise, we will use simulated data to examine how different weighting techniques affect estimates from non-probability samples. This will help us understand the role of weighting adjustments in improving the representativeness of such samples.
 
 ## Exercise 1
 
-In this exercise, we'll calculate basic post-stratification weights based on a simulated sample of coffee drinkers. This convenience sample of coffee drinkers was taken at a coffee shop. We've obtained city-level data on people aged 18+ that we can use to reweight on  age and income. 
+In this exercise, we'll calculate basic post-stratification weights based on a simulated sample of coffee drinkers. This convenience sample of coffee drinkers was taken at a coffee shop. We've obtained city-level data on people aged 18+ that we can use to reweight on age and income.
 
 ```{r}
 ## library packages 
 library(tidyverse)
+library(cowplot)
 ```
 
-First, we'll load our simulated data. 
+First, we'll load our simulated data.
 
 ```{r}
 ## read in sample data 
@@ -49,7 +50,7 @@ sample_proportion <- sample_data %>%
   mutate(sample_proportion = n / sum(n))
 ```
 
-We'll also read in our auxiliary data from the city on the true porportion of people in each group. 
+We'll also read in our auxiliary data from the city on the true porportion of people in each group.
 
 ```{r}
 ## read in auxiliary population proportions 
@@ -63,14 +64,13 @@ pop_proportion <- data.frame(
                    "High","High"))
 ```
 
+## Calculating weights
 
-## Calculating weights 
-
-Post-stratification weighting is a technique used to correct for discrepancies between a sample and the true population distribution. In our case,  merge sample proportions from our convenience sample taken at a coffee shop with known population proportions based on shared characteristics such as age group and income group. It's key that your sample collects the same information as is available in the auxiliary population data. 
+Post-stratification weighting is a technique used to correct for discrepancies between a sample and the true population distribution. In our case, merge sample proportions from our convenience sample taken at a coffee shop with known population proportions based on shared characteristics such as age group and income group. It's key that your sample collects the same information as is available in the auxiliary population data.
 
 By calculating the inclusion probability (the ratio of the sample proportion to the population proportion), we can determine how over- or underrepresented each group is in the sample. The weight for each group is then computed as the inverse of this probability; this ensures that underrepresented groups receive higher weights while overrepresented groups receive lower ones. This process helps adjust for biases that arise in non-probability samples, making our estimates more representative of the population.
 
-Once the weights are calculated, they are merged back into the sample dataset so that each person is assigned a weight based on their demographic characteristics. These weights have simple explanation: they represent how much each individual in the sample should "count" in order to make the sample more representative of the overall population. A person in an overrepresented group will have a weight smaller than 1, meaning their influence on estimates is reduced, while someone in an underrepresented group will have a weight greater than 1, increasing their influence on final statistics. 
+Once the weights are calculated, they are merged back into the sample dataset so that each person is assigned a weight based on their demographic characteristics. These weights have simple explanation: they represent how much each individual in the sample should "count" in order to make the sample more representative of the overall population. A person in an overrepresented group will have a weight smaller than 1, meaning their influence on estimates is reduced, while someone in an underrepresented group will have a weight greater than 1, increasing their influence on final statistics.
 
 We'll first calculate probability inclusion for each person in cells cross-classified by age and gender
 
@@ -83,7 +83,7 @@ poststrat_weights <- sample_proportion %>%
   select(age_group, income_group, weight)
 ```
 
-Next, we'll use the sample data to construct post-stratifiation weights. 
+Next, we'll use the sample data to construct post-stratifiation weights.
 
 ```{r}
 ## add on weights 
@@ -103,17 +103,402 @@ Exercise 1 questions
 
 2.  Do we trust our new weighted estimates? What things might our poststratification weights not be capturing?
 
+## Exercise 2
 
-## Exerise 2
-
-
-Scenario: We are developing a new method for estimating mortality rates in humanitarian emergencies using the network survival method. This approach relies on a non-probability sample, which presents challenges in ensuring that our estimates accurately reflect the broader population. In real conflict settings, researchers often face significant barriers to collecting truly random samples, making non-probability approaches necessary. In most humanitarian emergencies (hurricanes, civil wars, etc.) we can't just send enumerators around to to conduct a probability sample! 
+Scenario: We are developing a new method for estimating mortality rates in humanitarian emergencies using the network survival method. This approach relies on a non-probability sample, which presents challenges in ensuring that our estimates accurately reflect the broader population. In real conflict settings, researchers often face significant barriers to collecting truly random samples, making non-probability approaches necessary. In most humanitarian emergencies (hurricanes, civil wars, etc.) we can't just send enumerators around to to conduct a probability sample!
 
 To imitate this setting, we have collected read data fom high-mortality conflict zone: Tanganyika province in the Democratic Republic of the Congo (DRC). The dataset comes from a quota sample drawn from key local hubs, including taxi stations, ports, markets, and hospitals. To improve estimation accuracy, we will apply different weighting techniques, including post-stratification and inverse-probability weighting, to adjust for potential biases in the sample and refine our mortality estimates.
 
+```{r}
+## read in data 
+quota_sample <- read_csv("~/workspace/teaching/css/data/network_survival_quota_sample.csv") 
+```
+
+Our survey asks respondents to report on two different social networks:
+
+-   Closest neighbors (top 5 closest by walking distance)
+
+-   Kin (children, siblings, parents, grandparents, grandchildren, aunts/uncles)
+
+For both groups, we have information for each survey respondent about (i) number of people in each group that they are connected to and (ii) number of people in each group that died in the past 120 days.
+
+### 
+
+## Network survival
+
+Our recommendations will be used by NGOs to determine whether there is a humanitarian emergency. We will estimate a mortality rate as expressed in deaths per 10,000 person days. This is the conventional way to express deaths for humanitarian emergencies (contrasts with the conventional demographic definition of deaths per 1,000 person-years).
+
+To estimate the crude death rate (our estimand), we use the following estimator:
+
+$$
+\widehat{M} = \left( \frac{\sum_{i \in s} w_i~y_{i, D} } {\sum_{i \in s} w_i~d_i~E_{i} } \right) \times 10,000.
+$$
+
+where
+
+-   $y_{i, D}$ is the total number of deaths reported by respondent $D$
+
+-   $d_i$ is the degree (e.g., number of kin that respondent $i$ is connected to)
+
+-   $E_i$ is the number of days of exposure that respondent $i$ reported (in this case, 120 days)
+
+-   $\sum_{i \in s}$ is the sum over every person $i$ the sample $s$
+
+Let’s focus on kin as an example. Calculating a mortality rate requires two key components: the number of deaths and the measure of exposure.
+
+Counting deaths: This is simply the total number of kin deaths.
+Measuring exposure: We calculate this by summing the total number of kin for each person, multiplied by their number of days of exposure.
+The mortality rate is then obtained by dividing the total number of deaths by the total exposure and multiplying by 10,000 to express the rate per day.
+
+We will compute this separately for the kin and network sample to produce two distinct estimates of the death rate.
+
+To begin, we’ll estimate the rates without applying weights: 
+
+```{r}
+# Calculate quota sample (using neighbor ties)
+quota_sample %>% 
+  filter(!is.na(num_deaths_kin)) %>% 
+  summarize(kin_death_rate_numerator = sum(num_deaths_kin), ## sum up all kin deaths 
+            kin_death_rate_denominator = sum(num_total_kin) * 120) %>%  ## sum up all kin and multiply by 120 days of exposure 
+  mutate(death_rate = 10000 * (kin_death_rate_numerator/kin_death_rate_denominator))
+
+
+# Calculate crude death rate (using kin ties)
+quota_sample %>% 
+  filter(!is.na(num_deaths_kin)) %>% 
+  summarize(kin_death_rate_numerator = sum(num_deaths_kin), ## sum up all kin deaths 
+            kin_death_rate_denominator = sum(num_total_kin) * 120) %>%  ## sum up all kin and multiply by 120 days of exposure 
+  mutate(death_rate = 10000 * (kin_death_rate_numerator/kin_death_rate_denominator))
+
+```
+
+Now let's write a function that will also take in weights 
+
+```{r}
+## network survival estimator function 
+network_survival_estimator <- function(data, deaths, degree, weights = NULL, exposure_days = 120) {
+  
+  ## calculate cdr 
+  data %>%
+    summarise(
+      kin_death_rate_numerator = sum(if (!is.null(weights)) .data[[weights]] * .data[[deaths]] else .data[[deaths]], na.rm = TRUE),
+      kin_death_rate_denominator = sum(if (!is.null(weights)) .data[[weights]] * .data[[degree]] else .data[[degree]], na.rm = TRUE) * exposure_days
+    ) %>%
+    mutate(death_rate = 10000 * (kin_death_rate_numerator / kin_death_rate_denominator))
+}
+
+```
+
+```{r}
+## calculate kin estimates 
+kin_estimates <- network_survival_estimator(data = quota_sample,
+                                            deaths = "num_deaths_kin",
+                                            degree = "num_total_kin",
+                                            weights = NULL,
+                                            exposure_days = 120) %>% 
+  mutate(tie = "kin")
+
+
+neighbor_estimates <- network_survival_estimator(data = quota_sample,
+                                                 deaths = "num_deaths_neighbours",
+                                                 degree = "num_total_neighbour",
+                                                 weights = NULL,
+                                                 exposure_days = 120) %>% 
+  mutate(tie = "neighbour")
+
+
+cdr_unweighted <- bind_rows(kin_estimates, neighbor_estimates) %>% 
+  mutate(weights = "Unweighted")
+```
 
 
 
+```{r}
+weighting_targets <- data.frame(gender = c("f","f","f","f","f","f",
+                       "f","f","f","f","f","f","f","f","f","f","f","f",
+                       "f","f","f","f","f","f","f","f","f","f","f",
+                       "f","f","f","f","f","f","f","m","m","m","m",
+                       "m","m","m","m","m","m","m","m","m","m","m","m",
+                       "m","m","m","m","m","m","m","m","m","m","m",
+                       "m","m","m","m","m","m","m","m","m","f","f","f",
+                       "m","m","m"),
+         age_class = c("[25,35)","[25,35)","[25,35)",
+                       "[25,35)","[25,35)","[25,35)","[35,45)","[35,45)",
+                       "[35,45)","[35,45)","[35,45)","[35,45)","[45,55)",
+                       "[45,55)","[45,55)","[45,55)","[45,55)","[45,55)",
+                       "[55,65)","[55,65)","[55,65)","[55,65)","[55,65)",
+                       "[55,65)","[65,100]","[65,100]","[65,100]","[65,100]",
+                       "[65,100]","[65,100]","[65,100]","[65,100]","[65,100]",
+                       "[65,100]","[65,100]","[65,100]","[25,35)","[25,35)",
+                       "[25,35)","[25,35)","[25,35)","[25,35)","[35,45)",
+                       "[35,45)","[35,45)","[35,45)","[35,45)","[35,45)",
+                       "[45,55)","[45,55)","[45,55)","[45,55)","[45,55)",
+                       "[45,55)","[55,65)","[55,65)","[55,65)","[55,65)",
+                       "[55,65)","[55,65)","[65,100]","[65,100]","[65,100]",
+                       "[65,100]","[65,100]","[65,100]","[65,100]","[65,100]",
+                       "[65,100]","[65,100]","[65,100]","[65,100]","[18,25)",
+                       "[18,25)","[18,25)","[18,25)","[18,25)","[18,25)"),
+       health_zone = c("Kalemie","Nyunzu","Nyemba",
+                       "Kalemie","Nyunzu","Nyemba","Kalemie","Nyunzu",
+                       "Nyemba","Kalemie","Nyunzu","Nyemba","Kalemie","Nyunzu",
+                       "Nyemba","Kalemie","Nyunzu","Nyemba","Kalemie",
+                       "Nyunzu","Nyemba","Kalemie","Nyunzu","Nyemba","Kalemie",
+                       "Nyunzu","Nyemba","Kalemie","Nyunzu","Nyemba",
+                       "Kalemie","Nyunzu","Nyemba","Kalemie","Nyunzu","Nyemba",
+                       "Kalemie","Nyunzu","Nyemba","Kalemie","Nyunzu",
+                       "Nyemba","Kalemie","Nyunzu","Nyemba","Kalemie","Nyunzu",
+                       "Nyemba","Kalemie","Nyunzu","Nyemba","Kalemie",
+                       "Nyunzu","Nyemba","Kalemie","Nyunzu","Nyemba","Kalemie",
+                       "Nyunzu","Nyemba","Kalemie","Nyunzu","Nyemba",
+                       "Kalemie","Nyunzu","Nyemba","Kalemie","Nyunzu","Nyemba",
+                       "Kalemie","Nyunzu","Nyemba","Kalemie","Nyemba",
+                       "Nyunzu","Kalemie","Nyemba","Nyunzu"),
+        population = c(17886.4375,13277.7060546875,
+                       22988.60546875,15550.3720703125,11544.1328125,
+                       19984.365234375,10983.482421875,8153.9130859375,14116.154296875,
+                       6675.62060546875,4956.04638671875,8579.8623046875,
+                       5683.61328125,4219.591796875,7304.859375,4952.4912109375,
+                       3676.79174804688,6364.94287109375,3735.70922851562,
+                       2773.47192382812,4801.4189453125,2633.54125976562,
+                       1955.55871582031,3385.51416015625,1897.60668945312,
+                       1408.86828613281,2439.03930664062,1736.50744628906,
+                       1289.18994140625,2231.77319335938,940.885131835938,
+                       698.504638671875,1209.15991210938,639.022399902344,474.427581787109,
+                       821.469665527344,12315.0810546875,9142.037109375,
+                       15827.7353515625,10706.6650390625,7948.45166015625,
+                       13759.349609375,7562.29248046875,5614.1962890625,9719.03125,
+                       5869.24267578125,4357.47509765625,7543.3359375,
+                       5501.1806640625,4083.9638671875,7069.8623046875,
+                       4793.5263671875,3558.61157226562,6160.220703125,3615.80029296875,
+                       2684.322265625,4646.94189453125,2549.009765625,
+                       1892.65612792969,3276.48583984375,1836.697265625,
+                       1363.57678222656,2360.55346679688,1680.76904296875,1247.75439453125,
+                       2159.98828125,910.6845703125,676.055603027344,
+                       1170.27844238281,618.511108398438,459.177337646484,
+                       795.017395019531,29802.733203125,38305.5578125,22124.5650390625,
+                       21394.749609375,27498.619140625,15882.85))
+  
+```
+
+```{r}
+weighting_targets
+```
+
+
+
+
+```{r}
+generate_poststrat_weights <- function(weighting_targets = weighting_targets, survey_df = survey_df) {
+
+  # Poststratification sample
+  poststrat_worldpop <- weighting_targets %>%
+    group_by(health_zone, age_class, gender) %>%
+    summarize(n = sum(population), .groups = "drop") %>%
+    group_by(health_zone) %>%
+    mutate(prop_pop = n / sum(n)) %>%
+    ungroup()
+
+  # Poststratification population
+  poststrat_sample <- survey_df %>%
+    group_by(health_zone, age_class, gender) %>%
+    summarize(n = n(), .groups = "drop") %>%
+    group_by(health_zone) %>%
+    mutate(prop_sample = n / sum(n)) %>%
+    ungroup()
+
+  # Poststratification weights
+  poststrat_weights <- poststrat_sample %>%
+    inner_join(poststrat_worldpop, by = c("age_class", "gender", "health_zone")) %>%
+    mutate(weight = prop_pop / prop_sample) %>%
+    dplyr::select(gender, age_class, health_zone, weight_poststrat = weight)
+
+  # Joining the poststratification weights back into survey_df
+  updated_survey_df <- survey_df %>%
+    left_join(poststrat_weights, by = c("gender", "age_class", "health_zone"))
+
+  # return updated survey df
+  return(updated_survey_df)
+}
+
+## generate weights 
+quota_sample <- generate_poststrat_weights(weighting_targets = weighting_targets, survey_df = quota_sample)
+```
+
+
+
+
+```{r}
+quota_sample %>% 
+  group_by(gender) %>% 
+  summarize(mean(weight_poststrat))
+
+
+## quota sample 
+quota_sample %>% 
+  ggplot() + 
+  geom_histogram(aes(x = weight_poststrat))
+
+```
+
+```{r}
+kin_estimates_poststrat <- network_survival_estimator(data = quota_sample,
+                                                      deaths = "num_deaths_kin",
+                                                      degree = "num_total_kin",
+                                                      weights = "weight_poststrat",
+                                                      exposure_days = 120) %>% 
+  mutate(tie = "kin")
+
+neighbor_estimates_poststrat <- network_survival_estimator(data = quota_sample,
+                                                           deaths = "num_deaths_neighbours",
+                                                           degree = "num_total_neighbour",
+                                                           weights = "weight_poststrat",
+                                                           exposure_days = 120) %>% 
+  mutate(tie = "neighbour")
+
+
+## weights 
+cdr_poststratification <- bind_rows(kin_estimates_poststrat, neighbor_estimates_poststrat) %>% 
+  mutate(weights = "Post-Stratification Weights")
+
+
+cdr_poststratification
+```
+
+
+## CDR post-stratification 
+
+```{r}
+cdr_estimates <- cdr_poststratification  %>% 
+  bind_rows(cdr_unweighted)
+
+cdr_estimates
+```
+
+
+Now let's visualize: 
+
+```{r}
+cdr_estimates %>% 
+  ggplot(aes(y = death_rate, x = tie, fill = weights)) + 
+  geom_col(size = 3, position = position_dodge2(.3)) + 
+  theme_cowplot() + 
+  ylim(0, .45) + 
+  theme(legend.position = "bottom") + 
+  labs(x = "",
+       y = "Death Rate") + 
+  geom_text(aes(y = death_rate + .02, label = round(death_rate, 2)), 
+            position = position_dodge2(1))
+
+```
+
+
+## Inverse probability weights 
+
+
+Our post-stratification weights slightly increased both estimates, but only marginally. However, this re-weighting may not fully account for all factors. For example, wealthier individuals are more likely to be connected to other wealthy individuals, who tend to have lower death rates.
+
+To better adjust for this, we need additional characteristics. The challenge with post-stratification is the c"urse of dimensionality" — as the number of stratification variables increases, cells become small, sparse, and produce extremely large weights, making inference difficult. 
+
+Instead, we'll use a model-based approach to estimate each person's probability of inclusion in the sample. Specifically, we'll fit a logistic regression predicting inclusion probability using a reference probability sample.
+
+This model will estimate the likelihood that an individual was selected for the quota sample. We will then use the inverse of this probability as a weight.
+
+
+
+
+```{r}
+## read in probability sample 
+probability_sample <- read_csv("../../data/weighting_targets_ipw.csv") %>%
+  mutate(inclusion = 0)
+
+## create inclusion variable = 1 
+quota_sample <- quota_sample %>% 
+  mutate(inclusion = 1)
+
+## pool the sample together 
+pooled_sample <- bind_rows(probability_sample, quota_sample)
+
+## construct a generalized linear models 
+selection_model <- glm(inclusion ~ gender + age_class + health_zone + manufactured_material_house, data = pooled_sample, family = "binomial")
+
+## print summary of model 
+summary(selection_model)
+
+
+## generate ipw weights 
+inclusion_prob <- predict(object = selection_model, newdata = quota_sample, type = "response")/mean(predict(object = selection_model, newdata = quota_sample, type = "response"))
+
+## quota sample 
+quota_sample <- quota_sample %>% 
+  mutate(weight_ipw = 1/inclusion_prob) %>% 
+  mutate(weight_ipw = case_when(weight_ipw > 10 ~ 10,
+         TRUE ~ weight_ipw))
+
+```
+
+Now let's create a histogram of our weights. 
+
+```{r}
+quota_sample %>% 
+  ggplot() +  
+  geom_histogram(aes(x = weight_ipw)) +
+  theme_cowplot()
+```
+Most weights are fairly small, but some are substantial, even greater than 5. 
+
+
+```{r}
+## inverse probability weights 
+kin_estimates_ipw <- network_survival_estimator(data = quota_sample,
+                                                      deaths = "num_deaths_kin",
+                                                      degree = "num_total_kin",
+                                                      weights = "weight_ipw",
+                                                      exposure_days = 120) %>% 
+  mutate(tie = "kin")
+
+## inverse probability weights 
+neighbor_estimates_ipw <- network_survival_estimator(data = quota_sample,
+                                                           deaths = "num_deaths_neighbours",
+                                                           degree = "num_total_neighbour",
+                                                           weights = "weight_ipw",
+                                                           exposure_days = 120) %>% 
+  mutate(tie = "neighbour")
+
+
+## weights 
+cdr_ipw <- bind_rows(kin_estimates_ipw, neighbor_estimates_ipw) %>% 
+  mutate(weights = "Inverse Probability Weights")
+
+```
+
+
+
+```{r}
+## inverse probability weights 
+cdr_estimates %>% bind_rows(cdr_ipw) %>% 
+    mutate(weights = factor(weights, levels = c("Unweighted", "Post-Stratification Weights", "Inverse Probability Weights"))) %>%  # Reorder weights
+
+  ggplot(aes(y = death_rate, x = reorder(tie, -death_rate), fill = weights)) + 
+  geom_col(size = 3, position = position_dodge2(.3)) + 
+  theme_cowplot() + 
+  ylim(0, .5) + 
+  theme(legend.position = "bottom") + 
+  labs(x = "",
+       y = "Death Rate") + 
+  geom_text(aes(y = death_rate + .02, label = round(death_rate, 2)), 
+            position = position_dodge2(1))
+
+```
+
+
+Exercise 2:
+
+
+**2.1** Recalculate the weights with logistic regression model with additional predictors of: `bed`, `radio` and `modern_fuel_type`. Are these predictors significant? 
+
+**2.2** Re-estimate using the new weights. Does your crude death rate change? 
+
+**2.3** 
 
 
 
