@@ -59,16 +59,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="css_lab2_files/libs/clipboard/clipboard.min.js"></script>
-<script src="css_lab2_files/libs/quarto-html/quarto.js"></script>
-<script src="css_lab2_files/libs/quarto-html/popper.min.js"></script>
-<script src="css_lab2_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="css_lab2_files/libs/quarto-html/anchor.min.js"></script>
-<link href="css_lab2_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="css_lab2_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="css_lab2_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="css_lab2_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="css_lab2_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="css_lab2_solutions_files/libs/clipboard/clipboard.min.js"></script>
+<script src="css_lab2_solutions_files/libs/quarto-html/quarto.js"></script>
+<script src="css_lab2_solutions_files/libs/quarto-html/popper.min.js"></script>
+<script src="css_lab2_solutions_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="css_lab2_solutions_files/libs/quarto-html/anchor.min.js"></script>
+<link href="css_lab2_solutions_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="css_lab2_solutions_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="css_lab2_solutions_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="css_lab2_solutions_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="css_lab2_solutions_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -183,7 +183,7 @@ window.Quarto = {
 ✖ dplyr::lag()      masks stats::lag()
 ✖ yardstick::spec() masks readr::spec()
 ✖ recipes::step()   masks stats::step()
-• Search for functions across packages at https://www.tidymodels.org/find/</code></pre>
+• Use suppressPackageStartupMessages() to eliminate package startup messages</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)       <span class="do">## pretty plots </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
@@ -231,7 +231,7 @@ The following object is masked from 'package:lubridate':
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="css_lab2_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="css_lab2_solutions_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -345,7 +345,7 @@ R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="css_lab2_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="css_lab2_solutions_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -440,7 +440,7 @@ R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="css_lab2_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="css_lab2_solutions_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -664,7 +664,7 @@ dbl (12): perc_used_internet_past12months_wght_age_15_to_49_wom, perc_used_i...
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="css_lab2_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="css_lab2_solutions_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -800,13 +800,22 @@ dbl (12): perc_used_internet_past12months_wght_age_15_to_49_wom, perc_used_i...
 <span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a><span class="do">## collect predictions from leave-one-country-out cross-validation</span></span>
 <span id="cb53-11"><a href="#cb53-11" aria-hidden="true" tabindex="-1"></a>loco_predictions <span class="ot">&lt;-</span> <span class="fu">collect_predictions</span>(rf_res_loco_cv_fold)</span>
 <span id="cb53-12"><a href="#cb53-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-13"><a href="#cb53-13" aria-hidden="true" tabindex="-1"></a><span class="do">## create plot </span></span>
-<span id="cb53-14"><a href="#cb53-14" aria-hidden="true" tabindex="-1"></a>loco_plot <span class="ot">&lt;-</span> loco_predictions <span class="sc">%&gt;%</span> </span>
+<span id="cb53-13"><a href="#cb53-13" aria-hidden="true" tabindex="-1"></a><span class="do">## create calibration plot </span></span>
+<span id="cb53-14"><a href="#cb53-14" aria-hidden="true" tabindex="-1"></a>loco_calibration_plot <span class="ot">&lt;-</span> loco_predictions <span class="sc">%&gt;%</span> </span>
 <span id="cb53-15"><a href="#cb53-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> perc_used_internet_past12months_wght_age_15_to_49_wom, <span class="at">y =</span> .pred)) <span class="sc">+</span> </span>
 <span id="cb53-16"><a href="#cb53-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
 <span id="cb53-17"><a href="#cb53-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span> </span>
 <span id="cb53-18"><a href="#cb53-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_cowplot</span>() <span class="sc">+</span> </span>
-<span id="cb53-19"><a href="#cb53-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Leave-one-country-out CV"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb53-19"><a href="#cb53-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Leave-one-country-out CV"</span>)</span>
+<span id="cb53-20"><a href="#cb53-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-21"><a href="#cb53-21" aria-hidden="true" tabindex="-1"></a>loco_calibration_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="css_lab2_solutions_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="do">## fit 10-fold calibration plot </span></span>
@@ -834,7 +843,7 @@ dbl (12): perc_used_internet_past12months_wght_age_15_to_49_wom, perc_used_i...
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="css_lab2_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="css_lab2_solutions_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>

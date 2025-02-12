@@ -305,7 +305,7 @@ rf_model_performance
 lm_model_performance
 ```
 
-The $R^2$ is higher for random forest than the linear model; a higher $R^2$ corresponds to better model performance. Across models, the RMSE and MAE values are lower for random forest than for the linear model. This again suggests that the random forest model is performing better than the linear model. 
+*The* $R^2$ *is higher for random forest than the linear model; a higher* $R^2$ *corresponds to better model performance. Across models, the RMSE and MAE values are lower for random forest than for the linear model. This again suggests that the random forest model is performing better than the linear model.*
 
 **1.3** Bias in machine learning refers to the systematic deviation of model predictions from the true values. A model is considered biased if it consistently overestimates or underestimates the actual values. To formally assess bias, we compute the average prediction error (mean residual):
 
@@ -333,7 +333,7 @@ paste("The bias is for the linear model is:", round(bias_linear_model, 4))
 paste("The bias is for random forest models is:", round(bias_rf, 4))
 ```
 
-Answer: Given that the units range from 0 to 10, the bias for both model is exteremely small, especially for the random forest model. 
+*Given that the units range from 0 to 10, the bias for both model is extremely small, especially for the random forest model.*
 
 # Exercise 2 - Predicting Subnational Internet Adoption
 
@@ -553,13 +553,14 @@ error_metrics_loco_cv %>%
   bind_rows(error_metrics_10fold)
 
 ```
-All three error metrics indicate that our predictions are less accurate when using leave-one-out cross-validation. For example, the R-squared value is 0.659 with 10-fold cross-validation but drops to 0.57 with leave-one-country-out cross-validation.
 
-Leave-one-country-out cross-validation provides a more conservative assessment because, in 10-fold cross-validation, we typically still have some data points for each country being predicted. Leave-one-country-out cross-validation better assesses the model’s ability to generalize to unseen countries, making it a stricter but more realistic test in this context.
+*All three error metrics indicate that our predictions are less accurate when using leave-one-out cross-validation. For example, the R-squared value is 0.659 with 10-fold cross-validation but drops to 0.57 with leave-one-country-out cross-validation.*
 
+*Leave-one-country-out cross-validation provides a more conservative assessment because, in 10-fold cross-validation, we typically still have some data points for each country being predicted. Leave-one-country-out cross-validation better assesses the model’s ability to generalize to unseen countries, making it a stricter (but more realistic!) test in this context.*
 
-**2.3** Create a calibration plot with our observed (x-axis) and predicted (y-axis) values for both 10-fold cross-validation and leave-one-country-out cross-validation. 
+**2.3** Create a calibration plot with our observed (x-axis) and predicted (y-axis) values for both 10-fold cross-validation and leave-one-country-out cross-validation.
 
+*Note: this problem is tricky as we'll have to tell our `fit_resamples()` function to save our predictions.* *Once we do this, we can use the `collect_predictions()` function to obtain our full set of cross-validation predictions.*
 
 ```{r}
 # Define a random forest specification 
@@ -575,12 +576,14 @@ rf_res_loco_cv_fold <- fit_resamples(
 loco_predictions <- collect_predictions(rf_res_loco_cv_fold)
 
 ## create calibration plot 
-loco_plot <- loco_predictions %>% 
+loco_calibration_plot <- loco_predictions %>% 
   ggplot(aes(x = perc_used_internet_past12months_wght_age_15_to_49_wom, y = .pred)) + 
   geom_point() + 
   geom_abline(slope = 1, linetype = "dashed", color = "red") + 
   theme_cowplot() + 
   labs(title = "Leave-one-country-out CV")
+
+loco_calibration_plot
 ```
 
 ```{r}
