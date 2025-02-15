@@ -18,11 +18,15 @@ Non-probability sampling is increasingly common in data collection and, in some 
 
 In the first exercise, we will use simulated data to examine how different weighting techniques affect estimates from non-probability samples. This will help us understand the role of weighting adjustments in improving the representativeness of such samples.
 
-Our second example will involve estimating mortality rates using a non-probability sample. We will use two different methods for.
+Our second example will involve estimating mortality rates using a non-probability sample.
 
 ## Exercise 1
 
-In this exercise, we'll calculate basic post-stratification weights based on a simulated convenience sample. This convenience sample was taken at a coffee shop. Respondents were asked about their age, income, and daily coffee consumption in cups. We've also obtained auxiliary city-level data on people aged 18+ that we can use to reweight on age and income.
+In this exercise, we'll calculate basic post-stratification weights based on a simulated convenience sample. A *survey weight* is a value assigned to each respondent in a survey to adjust for unequal probabilities of selection, nonresponse, and other biases, ensuring that the sample represents the target population accurately.
+
+There are lots of different approaches to generating survey weights. The 'right' weighting strategy depends on the availability of auxiliary data, the survey design, and the specific biases you aim to correct. Ideally, the chosen weighting strategy should improve representativeness by aligning the sample with known population characteristics — while minimizing variance and other distortions in estimates.
+
+This (hypothetical) convenience sample was taken at a coffee shop. Respondents were asked about their age, income, and daily coffee consumption in cups. We've also obtained auxiliary city-level data on people aged 18+ that we can use to reweight on age and income.
 
 ```{r}
 ## library packages 
@@ -30,7 +34,7 @@ library(tidyverse)
 library(cowplot)
 ```
 
-First, we'll load our simulated data and caluclate the 
+First, we'll load our data:
 
 ```{r}
 ## read in sample data 
@@ -47,14 +51,9 @@ coffee_shop_sample <- data.frame(
   coffee_consumption = c(2.7,1.2,2.8,4.2,4.9,
                          2.6,2.7,1.2,3.5,2.4,3.5,3.7,4,2.4,3.5,1.3,2.2,
                          2.1,0.6,3))
-
-## read in sample proportion data 
-coffee_shop_sample_proportions <- coffee_shop_sample %>% 
-  count(age_group, income_group) %>% 
-  mutate(sample_proportion = n / sum(n))
 ```
 
-We'll also read in our auxiliary data from the city on the true porportion of people in each group.
+We'll also read in our auxiliary data from the city on the true proportion of people in each group.
 
 ```{r}
 ## read in auxiliary population proportions 
@@ -70,15 +69,23 @@ pop_proportion <- data.frame(
 
 ## Calculating Post-stratification Weights
 
-Post-stratification weighting is a technique used to correct for discrepancies between a sample and the true population distribution. In our case, merge sample proportions from our convenience sample taken at a coffee shop with known population proportions based on shared characteristics such as age group and income group. It's key that your sample collects the same information as is available in the auxiliary population data.
+Post-stratification weighting is a statistical re-weighting approach used to correct for discrepancies between a sample and the true population distribution. Specifically, the population is split into mutually extensive groups ("cells") based on characteristics (e.g., age, gender, and race). Each cell's survey responses are then weighted according to known population distributions:
 
-By calculating the inclusion probability (the ratio of the sample proportion to the population proportion), we can determine how over- or underrepresented each group is in the sample. The weight for each group is then computed as the inverse of this probability; this ensures that underrepresented groups receive higher weights while overrepresented groups receive lower ones. This process helps adjust for biases that arise in non-probability samples, making our estimates more representative of the population.
+$$ 
+\text{Weight}_{\text{cell}} = \frac{\text{Population Proportion}_{\text{cell}}}{\text{Sample Proportion}_{\text{cell}}} $$
 
-Once the weights are calculated, they are merged back into the sample dataset so that each person is assigned a weight based on their demographic characteristics. These weights have simple explanation: they represent how much each individual in the sample should "count" in order to make the sample more representative of the overall population. A person in an overrepresented group will have a weight smaller than 1, meaning their influence on estimates is reduced, while someone in an underrepresented group will have a weight greater than 1, increasing their influence on final statistics.
+Intuitively, the units in each cell have an inclusion probability equal to the ratio of the sample proportion to the population proportion. The weight for each group is then computed as the inverse of this probability; this ensures that underrepresented groups receive higher weights while overrepresented groups receive lower ones.
 
-We'll first calculate probability inclusion for each person in cells cross-classified by age and gender:
+When implementing post-stratification in practice, it's important that your sample collects the same information as is available in the auxiliary population data (i.e., design your survey instrument in such a way to collect all the data you need for weighting!).
+
+The code below will generate post-stratification weights on income and age group.
 
 ```{r}
+## calculate sample porportion 
+sample_proportion <- coffee_shop_sample %>% 
+  count(income_group, age_group) %>% 
+  mutate(sample_proportion = n / sum(n))
+
 ## join population proportions together 
 poststrat_weights <- sample_proportion %>% 
   inner_join(pop_proportion, by = join_by(age_group, income_group)) %>% 
@@ -87,22 +94,22 @@ poststrat_weights <- sample_proportion %>%
   select(age_group, income_group, weight)
 ```
 
-Next, we'll use the sample data to construct post-stratifiation weights:
+Next, we'll use the sample data to construct post-stratification weights:
 
 ```{r}
 ## add on weights 
-sample_data_weighted <- sample_data %>% 
+sample_data_weighted <- coffee_shop_sample %>% 
   left_join(poststrat_weights, by = c("age_group", "income_group"))
 ```
 
 Exercise 1 questions
 
-1.  Make a histogram of our weights using `ggplot` and `geom_histogram()`
-2.  Calculate the mean weight
-3.  Compare the weighted and unweighted averaged. Which is larger ?
+1.  Make a histogram of the distribution of the weights using `ggplot` and `geom_histogram()`
+2.  Calculate the mean (average) weighted
+3.  Compare the weighted and unweighted averaged. Which is larger?
 4.  Do we trust our new weighted estimates? What things might our poststratification weights not be capturing?
 
-#### Solutions 
+#### Solutions
 
 ```{r}
 ## 1.1 
@@ -128,9 +135,15 @@ sample_data_weighted %>%
 
 ## Exercise 2
 
-Scenario: We are developing a new method for estimating mortality rates in humanitarian emergencies using the network survival method. This approach relies on a non-probability sample, which presents challenges in ensuring that our estimates accurately reflect the broader population. In real conflict settings, researchers often face significant barriers to collecting truly random samples, making non-probability approaches necessary. In most humanitarian emergencies (hurricanes, civil wars, etc.) we can't just send enumerators around to to conduct a probability sample.
+***Estimating mortality rates with a non-probability sample***
 
-To imitate this setting, we have collected read data fom a high-mortality conflict zone: Tanganyika province in the Democratic Republic of the Congo (DRC). The dataset comes from a quota sample drawn from key local hubs, including taxi stations, ports, markets, and hospitals. To improve estimation accuracy, we will apply different weighting techniques, including post-stratification and inverse-probability weighting, to adjust for potential biases in the sample and refine our mortality estimates.
+In Exercise 2, we are apply a new method for estimating mortality rates in humanitarian emergencies. This method combines the network survival method with non-probability sampling—the type of sample we might be able to collect in a humanitarian emergency (hurricanes, civil wars, etc.). In such settings, researchers often face significant barriers to collecting truly random samples, making non-probability approaches necessary.
+
+The data collected for this exercise come from the Tanganyika Province of the Democratic Republic of the Congo (DRC). A quota sample drawn from key local hubs, including taxi stations, ports, markets, and hospitals.
+
+In this exercise, we will assess the impact of different weighting strategies on our mortality estimates. Specifically, we will apply two different weighting techniques: post-stratification and inverse-probability weighting.
+
+Background: Our quota sample was likely to over-represent more affluent people, who we anticipate would have lower mortality in their social network.
 
 ```{r}
 ## read in data 
@@ -147,9 +160,9 @@ For both groups, we have information for each survey respondent about (i) number
 
 ## Network survival
 
-Our recommendations will be used by NGOs to determine whether there is a humanitarian emergency. We will estimate a mortality rate as expressed in deaths per 10,000 person days. This is the conventional way to express deaths for humanitarian emergencies (contrasts with the conventional demographic definition of deaths per 1,000 person-years).
+We will estimate a mortality rate as expressed in deaths per 10,000 person days. This is the conventional way to express deaths for humanitarian emergencies; it contrasts with the conventional demographic definition of deaths per 1,000 person-years.
 
-To estimate the crude death rate (our estimand), we use the following estimator:
+To estimate the crude death rate (our estimand of interest), we use the following estimator:
 
 $$
 \widehat{M} = \left( \frac{\sum_{i \in s} w_i~y_{i, D} } {\sum_{i \in s} w_i~d_i~E_{i} } \right) \times 10,000.
@@ -165,18 +178,19 @@ where
 
 -   $\sum_{i \in s}$ is the sum over every person $i$ the sample $s$
 
-Let’s focus on kin as an example. Calculating a mortality rate requires two key components: the number of deaths and the measure of exposure.
+Let’s focus on kin network as an example. Calculating a death rate requires two key components, the number of deaths and the measure of exposure.
 
--   Counting deaths: This is simply the total number of kin deaths.
+-   Counting deaths: This is simply the total number of kin deaths reported by everyone in the sample.
 
--   Measuring exposure: We calculate this by summing the total number of kin for each person, multiplied by their number of days of exposure. The mortality rate is then obtained by dividing the total number of deaths by the total exposure and multiplying by 10,000 to express the rate per day.
+-   Measuring exposure: We calculate this by summing the total number of kin for each person, multiplied by their number of days of exposure.
 
-We will compute this separately for the kin and network sample to produce two distinct estimates of the death rate.
+The mortality rate is then obtained by dividing the total number of deaths by the total exposure and multiplying by 10,000 to express the rate per day. We will compute this separately for the kin and network sample to produce two distinct estimates of the death rate.
 
-To begin, we’ll estimate the rates without applying weights:
+We'll estimate the rates without applying weights:
+
 
 ```{r}
-# Calculate quota sample (using neighbor ties)
+# Calculate crude death rate sample (using neighbor ties)
 quota_sample %>% 
   filter(!is.na(num_deaths_kin)) %>% 
   summarize(kin_death_rate_numerator = sum(num_deaths_kin), ## sum up all kin deaths 
@@ -191,7 +205,7 @@ quota_sample %>%
   mutate(death_rate = 10000 * (neighbour_death_rate_numerator/neighbour_death_rate_denominator))
 ```
 
-As we're going to do this multiple times, let's write a function. The functions will have a few different arguments, including:
+As we're going to estimate the crude death rate, let's write a function to make things simpler. The functions will have a few different arguments, including:
 
 -   `deaths`: the column for reported deaths in social network
 
@@ -201,7 +215,7 @@ As we're going to do this multiple times, let's write a function. The functions 
 
 -   `exposure days` the number of days of exposure reported by each person (i.e., how long the mortality report window is in days)
 
-The function will output the numerator, denominator. If no weights are supplied, it will generate unweighted estimates.
+If no weights are supplied, this function will generate unweighted estimates.
 
 ```{r}
 ## network survival estimator function 
@@ -218,10 +232,10 @@ network_survival_estimator <- function(data, deaths, degree, weights = NULL, exp
 
 ```
 
-Now let's just using the function to confrim what we calculated above: 
+Let's practice applying the function: 
 
 ```{r}
-## calculate kin estimates 
+## calculate kin crude death rate  
 kin_estimates <- network_survival_estimator(data = quota_sample,
                                             deaths = "num_deaths_kin",
                                             degree = "num_total_kin",
@@ -229,7 +243,7 @@ kin_estimates <- network_survival_estimator(data = quota_sample,
                                             exposure_days = 120) %>% 
   mutate(tie = "kin")
 
-
+## calculate neighbor crude death rate 
 neighbor_estimates <- network_survival_estimator(data = quota_sample,
                                                  deaths = "num_deaths_neighbours",
                                                  degree = "num_total_neighbour",
@@ -237,29 +251,27 @@ neighbor_estimates <- network_survival_estimator(data = quota_sample,
                                                  exposure_days = 120) %>% 
   mutate(tie = "neighbour")
 
-## cdr unweighted 
+## calculate crude death rate  
 cdr_unweighted <- bind_rows(kin_estimates, neighbor_estimates) %>% 
   mutate(weights = "Unweighted")
 ```
 
-Our estimates from the function align exactly with our previous estimates. 
-
-
-#### Poststratification weights 
+#### Poststratification weights
 
 ```{r}
 ## read in post-stratification weights 
 ## this will need to be updated 
-weighting_targets <- read_csv("../../data/weighting_targets_poststrat.csv")
+poststrat_weighting_targets <- read_csv("../../data/weighting_targets_poststrat.csv")
 
 ## look at weighting targets 
-weighting_targets
+poststrat_weighting_targets
 ```
-Let's calculate post-stratification weights using the age class and gender. 
+
+Let's calculate post-stratification weights using the age class and gender.
 
 ```{r}
 # Poststratification sample proporitons 
-poststrat_worldpop <- weighting_targets %>%
+poststrat_worldpop <- poststrat_weighting_targets %>%
   group_by(age_class, gender) %>%
   summarize(n = sum(population), .groups = "drop") %>%
   mutate(prop_pop = n / sum(n)) %>%
@@ -283,6 +295,8 @@ quota_sample <- quota_sample %>%
     left_join(poststrat_weights, by = c("gender", "age_class"))
 ```
 
+Now we can visualize the distribution of weights. 
+
 ```{r}
 ## quota sample 
 quota_sample %>% 
@@ -291,7 +305,7 @@ quota_sample %>%
   theme_cowplot()
 ```
 
-Now let's calculate the weighted estimates. Note that we need to explicitly tell our function what set of weights to us. 
+The distribution of weights looks reasonable: there are no huge weights. We're read to calculate the weighted estimates. Note that we need to explicitly tell our function what weight column to use.
 
 ```{r}
 ## kin estimates poststratification 
@@ -318,6 +332,8 @@ cdr_poststratification <- bind_rows(kin_estimates_poststrat, neighbor_estimates_
 cdr_poststratification
 ```
 
+We can check whether the new weighted estimates are higher than the weighted estimates. 
+
 ```{r}
 ## combine cdr estimates with unweighted estimates 
 cdr_estimates <- cdr_poststratification  %>% 
@@ -338,9 +354,9 @@ cdr_estimates %>%
 
 ## Inverse probability weights
 
-Our post-stratification weights slightly increased both estimates, but only marginally. However, this re-weighting may not fully account for all factors. For example, wealthier individuals are more likely to be connected to other wealthy individuals, who tend to have lower death rates.
+Our post-stratification weights increased our estimates of the crude mortality rate, but only slightly. However, this re-weighting may not fully account for all factors. Recall, we didn't For example, wealthier individuals are more likely to be connected to other wealthy individuals, who we would expect to have lower death rates.
 
-To better adjust for this, we need additional characteristics. The challenge with post-stratification is the c"urse of dimensionality" — as the number of stratification variables increases, cells become small, sparse, and produce extremely large weights, making inference difficult.
+To better adjust for this, we need additional characteristics. The challenge with post-stratification is the "curse of dimensionality" — as the number of stratification variables increases, cells become small, sparse, and produce extremely large weights, making inference difficult.
 
 Instead, we'll use a model-based approach to estimate each person's probability of inclusion in the sample. Specifically, we'll fit a logistic regression predicting inclusion probability using a reference probability sample.
 
@@ -384,7 +400,7 @@ quota_sample %>%
   theme_cowplot()
 ```
 
-Most weights are fairly small, but some are substantial, even greater than 5. We can now calculate our crude death rate. 
+The distribution of the weights looks reasonable. We can now calculate our crude death rate.
 
 ```{r}
 ## inverse probability weights 
@@ -409,8 +425,7 @@ cdr_ipw <- bind_rows(kin_estimates_ipw, neighbor_estimates_ipw) %>%
   mutate(weights = "Inverse Probability Weights")
 ```
 
-
-## Inverse probability weights 
+## Inverse probability weights
 
 ```{r}
 ## inverse probability weights 
@@ -430,18 +445,17 @@ cdr_estimates %>%
 
 ```
 
-Our estimates are very similar regardless of whether we use post-stratification weights or inverse probability weigts. However, we have more covariates we can use for inverse probability weights that capture socioeconomic status (SES). 
+Our estimates are very similar regardless of whether we use post-stratification weights or inverse probability weights. However, we have more covariates in our model that better capture socioeconomic status (SES).
 
 Exercise 2:
 
-We're worried that our sample taken at major hubs is overrepresenting wealthier individuals. To account for this, we'll use these four covariates 
+We're worried that our sample taken at major hubs is overrepresenting wealthier individuals. To account for this, we'll use these four covariates that proxy for wealth: `manufactured_material_house`, `bed`, `radio` and `modern_fuel_type`. 
 
-**2.1** Recalculate the weights using logistic regression model that has the following additional predictors: `manufactured_material_house` `bed`, `radio` and `modern_fuel_type`. These are classic predictors of wealth. Are these predictors statistically significant in our logistic regression model?
+**2.1** Recalculate the weights using logistic regression model with the following additional predictors: `manufactured_material_house` `bed`, `radio` and `modern_fuel_type`. These are classic predictors of wealth. Are these predictors statistically significant in our logistic regression model?
 
-**2.2** Re-estimate the crude death rate using the new weights. How does your crude death rate change? Make a visualization of the unweighte estimate, post-stratification estimate, and the overall estimate. 
+**2.2** Re-estimate the crude death rate using the new weights. How does your crude death rate change? Make a visualization of the unweighte estimate, post-stratification estimate, and the overall estimate.
 
-**2.3** Why do we think that our crude rates are changing when our weights account for socioeconomic status. What does this tell us about the relative mortality risk of people people with low SES? 
-
+**2.3** Why do we think that our crude rates are changing when our weights account for socioeconomic status. What does this tell us about the relative mortality risk of people people with low SES?
 
 ```{r}
 ### 2.1 
@@ -452,7 +466,7 @@ selection_model_ses <- glm(inclusion ~ gender + age_class + manufactured_materia
 summary(selection_model_ses)
 ```
 
-Yes, all the new SES coefficients are statistically significant besides radio.  
+Yes, all the new SES coefficients are statistically significant besides radio.
 
 ```{r}
 ### 2.2 
@@ -500,14 +514,12 @@ cdr_estimates %>%
             position = position_dodge2(1))
 ```
 
-Our estimate increases when we adjust for socioeconomic selection. 
+Our estimate increases when we adjust for socioeconomic selection.
 
-2.3 
+2.3
 
-Our estimates increase when we adjust for socioeconomic status. This suggests that people with low SES (who were underrepresented in our quota survey) have higher mortality in their social networks. 
+Our estimates increase when we adjust for socioeconomic status. This suggests that people with low SES (who were underrepresented in our quota survey) have higher mortality in their social networks.
 
-Bonus exercise: 
+Bonus exercise:
 
-* Calculate separate crude death rates by health zone using no weights, post-stratification weights, and inverse probability weights (with SES variables). What health zone has the highest crude death rate? 
-
-
+-   Calculate separate crude death rates by health zone using no weights, post-stratification weights, and inverse probability weights (with SES variables). What health zone has the highest crude death rate?
