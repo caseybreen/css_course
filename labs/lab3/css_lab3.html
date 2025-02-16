@@ -151,9 +151,10 @@ window.Quarto = {
 </section>
 <section id="exercise-1" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-1">Exercise 1</h2>
-<p>In this exercise, we’ll calculate basic post-stratification weights based on a simulated convenience sample. A <em>post-stratification weight</em> is a type of <em>survey weight</em>, a value assigned to each respondent in a survey to adjust for unequal probabilities of selection. The big-picture goal of constructing survey weights is to adjust the sample so that it more accurately represents the target population. This is particularly important in non-probability samples, where certain groups may be over- or underrepresented due to selection biases.</p>
+<p>In this exercise, we’ll construct post-stratification weights for a simulated convenience sample. A <em>post-stratification weight</em> is a type of survey weight (a value assigned to each respondent in a survey to adjust for unequal probabilities of selection). The big-picture goal of constructing survey weights is to adjust the sample so that it more accurately represents the target population. This is particularly important in non-probability samples, where certain groups may be over- or underrepresented due to selection biases.</p>
 <p>There are lots of different approaches to generating survey weights. The ‘right’ weighting strategy depends on the availability of auxiliary data, the survey design, and the specific biases you aim to correct. Ideally, the chosen weighting strategy should improve representativeness by aligning the sample with known population characteristics — while minimizing variance and other distortions in estimates.</p>
-<p>This (hypothetical) convenience sample was taken at a coffee shop to help better understand average daily coffee consumption among adults. Respondents were asked about their age, income, and daily coffee consumption in cups. We’ve also obtained auxiliary city-level data on proportion of people aged 18+ in each age X income group (“cell”). We will use this auxiliary data to construct post-stratification weights.</p>
+<p>This (hypothetical) convenience sample was taken at a coffee shop with the goa of better understanding average daily coffee consumption among adults. Respondents were asked about their age, income, and daily coffee consumption in cups.</p>
+<p>To help construct the post-stratification weights, we’ve also obtained auxiliary city-level data on proportion of people aged 18+ in each age X income group (“cell”). We will use this auxiliary data to construct the post-stratification weights.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## library packages </span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
@@ -191,15 +192,15 @@ window.Quarto = {
 </section>
 <section id="constructing-post-stratification-weights" class="level2">
 <h2 class="anchored" data-anchor-id="constructing-post-stratification-weights">Constructing post-stratification weights</h2>
-<p>Post-stratification weighting is a statistical re-weighting approach used to correct for discrepancies between a sample and the true population distribution. Specifically, the population is split into mutually exclusive groups (“cells”) based on characteristics (e.g., age, gender, and income). Each cell’s survey responses are then weighted according to known population distributions:</p>
-<p>Intuitively, the units in each cell have an inclusion probability equal to the ratio of the sample proportion to the population proportion. The weight for each group is then computed as the inverse of this probability; this ensures that underrepresented groups receive higher weights while overrepresented groups receive lower ones.</p>
+<p>Post-stratification weighting is a statistical re-weighting approach used to correct for differences between a sample and the population of interest. Specifically, the sample is split into mutually exclusive groups (“cells”) based on characteristics (e.g., age, gender, and income). The respondents in each cell have an inclusion probability equal to the ratio of the sample proportion to the population proportion.</p>
+<p>The weight for each group is then calculated as the inverse of this inclusion probability; this ensures that underrepresented groups receive higher weights while overrepresented groups receive lower ones.</p>
 <p><span class="math display">\[
 \text{Inclusion Probability}_{\text{cell}} = \frac{\text{Sample Proportion}_{\text{cell}}}{\text{Population Proportion}_{\text{cell}}}
 \]</span></p>
 <p><span class="math display">\[
 \text{Weight}_{\text{cell}} = \frac{1}{\text{Inclusion Probability}_{\text{cell}}} = \frac{\text{Population Proportion}_{\text{cell}}}{\text{Sample Proportion}_{\text{cell}}}
 \]</span> When implementing post-stratification in practice, it’s important that your sample collects the same information as is available in the auxiliary population data (i.e., design your survey instrument in such a way to collect all the data you’ll need to construct survey weights!).</p>
-<p>The code below will generate post-stratification weights on income and age group.</p>
+<p>The code below generates post-stratification weights on income and age group.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## calculate sample proportion </span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sample_proportion <span class="ot">&lt;-</span> coffee_shop_sample <span class="sc">%&gt;%</span> </span>
@@ -217,25 +218,24 @@ window.Quarto = {
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>poststrat_weights <span class="ot">&lt;-</span> poststrat_weights <span class="sc">%&gt;%</span> </span>
 <span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">weight =</span> weight)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Next, we’ll use the sample data to construct post-stratification weights:</p>
+<p>Now we’ll join these post-stratification weights back onto our sample. We will also standardize the weights by dividing each weight by the average weight. This standardization step ensures that the average weight is 1, which is helpful when calculating weighted sums and averages.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## add on weights </span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sample_data_weighted <span class="ot">&lt;-</span> coffee_shop_sample <span class="sc">%&gt;%</span> </span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(poststrat_weights, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"age_group"</span>, <span class="st">"income_group"</span>))</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="do">## normalize weights so average weight is 1 </span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>sample_data_weighted <span class="ot">&lt;-</span> sample_data_weighted <span class="sc">%&gt;%</span> </span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">weight =</span> weight<span class="sc">/</span><span class="fu">mean</span>(weight)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>sample_data_weighted <span class="ot">&lt;-</span> sample_data_weighted <span class="sc">%&gt;%</span> </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">weight =</span> weight<span class="sc">/</span><span class="fu">mean</span>(weight)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="exercise-1-questions" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-1-questions">Exercise 1 questions</h2>
 <ol type="1">
 <li>Make a histogram of the distribution of the weights using <code>ggplot</code> and <code>geom_histogram()</code></li>
-<li>Calculate the mean (average) weighted</li>
+<li>Calculate the mean (average) weight. Did our standardization work?</li>
 <li>Compare the weighted and unweighted averaged. Which is larger?</li>
-<li>Do we trust our new weighted estimates? What things might our poststratification weights not be capturing?</li>
+<li>Do we trust our new weighted estimates of the average number of coffee drinkers? What things might our poststratification weights not be capturing?</li>
 </ol>
 <section id="exercise-1-solutions" class="level3">
 <h3 class="anchored" data-anchor-id="exercise-1-solutions">Exercise 1 solutions</h3>
@@ -271,8 +271,7 @@ window.Quarto = {
 1      2.725 2.506159</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 1.4 </span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Answer: No! We are sampling in a coffee shop—holding constant age and gender, these people are going to drink more coffee on average. </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Answer: No,  We are sampling in a coffee shop—holding constant age and gender, these people are going to drink more coffee on average. </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -529,7 +528,7 @@ dbl  (7): hh_size, age_u5, age_5_18, age_18plus, modern_fuel_type, manufactu...
 2                 249.               7700226.      0.324 neighbour Post-Stratif…</code></pre>
 </div>
 </div>
-<p>We can check whether the new weighted estimates are higher than the weighted estimates:</p>
+<p>We can check whether the new post-stratification weighted estimates are higher than the weighted estimates:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="do">## combine cdr estimates with unweighted estimates </span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>cdr_estimates <span class="ot">&lt;-</span> cdr_poststratification  <span class="sc">%&gt;%</span> </span>
@@ -566,7 +565,7 @@ dbl  (7): hh_size, age_u5, age_5_18, age_18plus, modern_fuel_type, manufactu...
 <p>Our post-stratification weights only account for age class and gender. For example, we may suspect that wealthier individuals are more likely to have social networks with lower mortality.</p>
 <p>To better adjust for this, we need additional characteristics. The challenge with post-stratification is the “curse of dimensionality” — as the number of stratification variables increases, cells become small, sparse, and produce extremely large weights. Recall our general rule of thumb — we don’t want any of weights to be more than 5x larger than our average weight.</p>
 <p>Instead of post-stratification, we’ll use a model-based approach to estimate each respondent’s probability of inclusion in the non-probability sample. Here we have collected an auxiliary probability-based sample to help with the reweighting.</p>
-<p>Specifically, we’ll first combine together a probability sample and the non-probability sample. We’ll then fit a logistic regression predicting inclusion probability in the non-probability sample. This model will estimate the likelihood that a given respondent was selected for the quota sample. We will then use the inverse of this probability as a weight.</p>
+<p>Specifically, we’ll first combine together a probability sample and a non-probability sample. We’ll then fit a logistic regression predicting inclusion probability in the non-probability sample. This model will estimate the likelihood that a given respondent was selected for the quota sample. We will then use the inverse of this probability as a weight.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="do">## read in probability sample </span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>probability_sample <span class="ot">&lt;-</span> probability_sample <span class="sc">%&gt;%</span></span>
@@ -636,7 +635,7 @@ Number of Fisher Scoring iterations: 5</code></pre>
 </div>
 </div>
 </div>
-<p>The distribution of the weights looks reasonable. We can now calculate our crude death rate.</p>
+<p>The distribution of the weights looks reasonable; there’s no extremely large weights. We can now calculate our crude death rate.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="do">## inverse probability weights </span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>kin_estimates_ipw <span class="ot">&lt;-</span> <span class="fu">network_survival_estimator</span>(<span class="at">data =</span> quota_sample,</span>
@@ -659,22 +658,21 @@ Number of Fisher Scoring iterations: 5</code></pre>
 <span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>cdr_ipw <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(kin_estimates_ipw, neighbor_estimates_ipw) <span class="sc">%&gt;%</span> </span>
 <span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">weights =</span> <span class="st">"Inverse Probability Weights"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Now we can benchmark our estimates using (i) no weights, (ii) poststratification weights, and (iii) inverse probability weights.</p>
+<p>Now we can compare our estimates of the crude death rate using (i) no weights, (ii) poststratification weights, and (iii) inverse probability weights.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="do">## inverse probability weights </span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>cdr_estimates <span class="sc">%&gt;%</span> </span>
 <span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(cdr_ipw) <span class="sc">%&gt;%</span> </span>
 <span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">weights =</span> <span class="fu">factor</span>(weights, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Unweighted"</span>, <span class="st">"Post-Stratification Weights"</span>, <span class="st">"Inverse Probability Weights"</span>))) <span class="sc">%&gt;%</span>  <span class="co"># Reorder weights</span></span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> death_rate, <span class="at">x =</span> <span class="fu">reorder</span>(tie, <span class="sc">-</span>death_rate), <span class="at">fill =</span> weights)) <span class="sc">+</span> </span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">position =</span> <span class="fu">position_dodge2</span>(.<span class="dv">3</span>)) <span class="sc">+</span> </span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_cowplot</span>() <span class="sc">+</span> </span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, .<span class="dv">5</span>) <span class="sc">+</span> </span>
-<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span> </span>
-<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">""</span>,</span>
-<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Death Rate"</span>) <span class="sc">+</span> </span>
-<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">y =</span> death_rate <span class="sc">+</span> .<span class="dv">02</span>, <span class="at">label =</span> <span class="fu">round</span>(death_rate, <span class="dv">3</span>)), </span>
-<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">position =</span> <span class="fu">position_dodge2</span>(<span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> death_rate, <span class="at">x =</span> <span class="fu">reorder</span>(tie, <span class="sc">-</span>death_rate), <span class="at">fill =</span> weights)) <span class="sc">+</span> </span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">position =</span> <span class="fu">position_dodge2</span>(.<span class="dv">3</span>)) <span class="sc">+</span> </span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_cowplot</span>() <span class="sc">+</span> </span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, .<span class="dv">5</span>) <span class="sc">+</span> </span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span> </span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">""</span>,</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Death Rate"</span>) <span class="sc">+</span> </span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">y =</span> death_rate <span class="sc">+</span> .<span class="dv">02</span>, <span class="at">label =</span> <span class="fu">round</span>(death_rate, <span class="dv">3</span>)), </span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">position =</span> <span class="fu">position_dodge2</span>(<span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -683,13 +681,13 @@ Number of Fisher Scoring iterations: 5</code></pre>
 </div>
 </div>
 </div>
-<p>Our estimates are very similar regardless of whether we use post-stratification weights or inverse probability weights. However, we have more covariates in our model that better capture socioeconomic status (SES).</p>
+<p>Our estimates are very similar regardless of whether we use post-stratification weights or inverse probability weights. However, we have more covariates in our model that better capture socioeconomic status (SES), which our theoretical intuition tells us may be important…</p>
 <section id="exercise-2-questions" class="level3">
 <h3 class="anchored" data-anchor-id="exercise-2-questions">Exercise 2 questions:</h3>
-<p>We’re worried that our quota sample is over-representing higher socioeconomic status individuals, which our weights aren’t properly accounting for. To address this, we’ll incorporate additional covariates into our model estimate inclusion probability.</p>
-<p><strong>2.1</strong> Recalculate the weights using logistic regression model with the following additional predictors: <code>manufactured_material_house,</code> <code>bed</code>, <code>radio,</code> and <code>modern_fuel_type</code>. These asset questions help measure wealth. Are these predictors statistically significant in our logistic regression model?</p>
-<p><strong>2.2</strong> Re-estimate the crude death rate using the new weights (using both kin and neighbor networks). How does your crude death rate change? Make a plot comparing the unweighted estimate, post-stratification estimate, and the new inverse-probability weighted estimate.</p>
-<p><strong>2.3</strong> Why do we think that our crude rates are changing when our weights account for socioeconomic status. What does this tell us about the relative mortality risk of people in the social networks of low SES respondents?</p>
+<p>We’re worried that our quota sample is over-representing higher SES individuals, which our weights aren’t properly accounting for. To address this, we’ll incorporate additional covariates into our model estimate inclusion probability.</p>
+<p><strong>2.1</strong> Recalculate the inverse probability weights using a new logistic regression model with the following additional predictors: <code>manufactured_material_house,</code> <code>bed</code>, <code>radio,</code> and <code>modern_fuel_type</code>. These covariates measure wealth. Are these predictors statistically significant in our logistic regression model?</p>
+<p><strong>2.2</strong> Re-estimate the crude death rate using the new weights (using both kin and neighbor networks). How does your crude death rate change? Make a plot comparing the unweighted estimate, post-stratification estimate, and the new inverse probability weighted estimate.</p>
+<p><strong>2.3</strong> Speculate on why our crude death rates change when our inverse probability weights account for socioeconomic status. What does this tell us about the relative risk of death in the social networks of low SES respondents?</p>
 </section>
 <section id="exercise-2-solutions" class="level3">
 <h3 class="anchored" data-anchor-id="exercise-2-solutions">Exercise 2 solutions</h3>
@@ -785,8 +783,7 @@ Number of Fisher Scoring iterations: 5</code></pre>
 </div>
 </div>
 <p><em>Our estimate increases when we adjust for socioeconomic selection.</em></p>
-<p>2.3</p>
-<p><em>Our estimates increase when we adjust for socioeconomic status. This suggests that people with low SES (who were underrepresented in our quota survey) have higher mortality in their social networks.</em></p>
+<p><strong>2.3</strong> <em>Our estimates increase when we adjust for socioeconomic status. This suggests that people with low SES (who were underrepresented in our quota survey) have higher mortality in their social networks.</em></p>
 </section>
 </section>
 <section id="bonus-exercise" class="level2">
