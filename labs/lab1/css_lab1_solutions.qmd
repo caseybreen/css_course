@@ -193,7 +193,7 @@ results <- list()
 # Loop through each age group and query the API
 for (i in seq_along(age_groups)) {
   
-  ## 
+  ## get min and max age 
   age_min <- age_groups[[i]][1]
   age_max <- age_groups[[i]][2]
   
