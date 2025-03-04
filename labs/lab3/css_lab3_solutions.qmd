@@ -92,8 +92,7 @@ sample_proportion <- coffee_shop_sample %>%
 ## join population proportions together 
 poststrat_weights <- sample_proportion %>% 
   inner_join(pop_proportion, by = join_by(age_group, income_group)) %>% 
-  mutate(inclusion_prop = sample_proportion / pop_proportion) %>% ## calculate inclusion probably by cell 
-  mutate(weight = 1 / inclusion_prop) %>%                         ## calculate weight 
+  mutate(weight = pop_proportion / sample_proportion) %>%                         ## calculate weight 
   select(age_group, income_group, weight)
 
 ```
