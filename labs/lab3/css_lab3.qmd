@@ -92,8 +92,7 @@ sample_proportion <- coffee_shop_sample %>%
 ## join population proportions together 
 poststrat_weights <- sample_proportion %>% 
   inner_join(pop_proportion, by = join_by(age_group, income_group)) %>% 
-  mutate(inclusion_prop = sample_proportion / pop_proportion) %>% ## calculate inclusion probably by cell 
-  mutate(weight = 1 / inclusion_prop) %>%                         ## calculate weight 
+  mutate(weight =  pop_proportion / sample_proportion) %>%      ## calculate weight 
   select(age_group, income_group, weight)
 
 ```
@@ -121,7 +120,7 @@ sample_data_weighted <- sample_data_weighted %>%
 
 ***Estimating crude death rates with a non-probability sample***
 
-In Exercise 2, we are going to apply a new method for estimating death rates in humanitarian emergencies. This new method combines the *network survival method* (described below) with a non-probability quota sample—the type of sample that researchers can realistically collect in a humanitarian emergency, such as a civil war. In such humanitarian emergencies, researchers often face significant barriers to collecting probability samples, mandating non-probability approaches to data collection.
+In Exercise 2, we are going to apply a new method for estimating death rates in humanitarian emergencies. This new method combines the *network survival method* (described below) with a non-probability quota sample—where researchers define a sample on a predetermined set of characteristics or quotas. This type of sample is one that researchers can realistically collect in a humanitarian emergency, such as a civil war. In such humanitarian emergencies, researchers often face significant barriers to collecting probability samples, mandating non-probability approaches to data collection.
 
 The data collected for this exercise come from the Tanganyika Province of the Democratic Republic of the Congo (DRC). Supervised survey enumerators collected data from major transit and economic hubs, including taxi stations, ports, markets, and hospitals using a quota sample design. The quotas were established based on gender and geographic region.
 
@@ -230,7 +229,7 @@ network_survival_estimator <- function(data, deaths, degree, weights = NULL, exp
 Let's try applying the function:
 
 ```{r}
-## calculate kin crude death rate  
+## calculate kin crude death rate for kin
 kin_estimates <- network_survival_estimator(data = quota_sample,
                                             deaths = "num_deaths_kin",
                                             degree = "num_total_kin",
@@ -238,7 +237,7 @@ kin_estimates <- network_survival_estimator(data = quota_sample,
                                             exposure_days = 120) %>% 
   mutate(tie = "kin")
 
-## calculate neighbour crude death rate 
+## calculate neighbour crude death rate for neighbours 
 neighbour_estimates <- network_survival_estimator(data = quota_sample,
                                                  deaths = "num_deaths_neighbours",
                                                  degree = "num_total_neighbour",

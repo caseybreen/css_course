@@ -92,8 +92,7 @@ sample_proportion <- coffee_shop_sample %>%
 ## join population proportions together 
 poststrat_weights <- sample_proportion %>% 
   inner_join(pop_proportion, by = join_by(age_group, income_group)) %>% 
-  mutate(inclusion_prop = sample_proportion / pop_proportion) %>% ## calculate inclusion probably by cell 
-  mutate(weight = 1 / inclusion_prop) %>%                         ## calculate weight 
+  mutate(weight =  pop_proportion / sample_proportion) %>%      ## calculate weight 
   select(age_group, income_group, weight)
 
 ```
@@ -150,7 +149,7 @@ sample_data_weighted %>%
 
 ***Estimating crude death rates with a non-probability sample***
 
-In Exercise 2, we are going to apply a new method for estimating death rates in humanitarian emergencies. This new method combines the *network survival method* (described below) with a non-probability quota sample—the type of sample that researchers can realistically collect in a humanitarian emergency, such as a civil war. In such humanitarian emergencies, researchers often face significant barriers to collecting probability samples, mandating non-probability approaches to data collection.
+In Exercise 2, we are going to apply a new method for estimating death rates in humanitarian emergencies. This new method combines the *network survival method* (described below) with a non-probability quota sample—where researchers define a sample on a predetermined set of characteristics or quotas. This type of sample is one that researchers can realistically collect in a humanitarian emergency, such as a civil war. In such humanitarian emergencies, researchers often face significant barriers to collecting probability samples, mandating non-probability approaches to data collection.
 
 The data collected for this exercise come from the Tanganyika Province of the Democratic Republic of the Congo (DRC). Supervised survey enumerators collected data from major transit and economic hubs, including taxi stations, ports, markets, and hospitals using a quota sample design. The quotas were established based on gender and geographic region.
 
