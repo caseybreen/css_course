@@ -30,7 +30,7 @@ There are many different methods for generating survey weights, and each method 
 
 This (simulated) convenience sample was conducted at a coffee shop. The goal of survey was to estimate the average daily coffee consumption in cups among adults in Mochatown. Respondents age 18+ who consented to participate in the study were asked about their age, income, and daily coffee consumption.
 
-To construct the poststratification weights, we have also obtained auxiliary city-level data on the proportion of people aged 18+ in each age X income group ("strata") in Melbourne. We will use this auxiliary data to help construct the poststratification weights.
+To construct the poststratification weights, we have also obtained auxiliary city-level data on the proportion of people aged 18+ in each age X income group ("strata") in Mochatown. We will use this auxiliary data to help construct the poststratification weights.
 
 ```{r, output = F}
 ## library packages 
