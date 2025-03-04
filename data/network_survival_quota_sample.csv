@@ -970,7 +970,6 @@ num_deaths_neighbours,num_deaths_kin,num_total_neighbour,num_total_kin,deaths_nu
 1,0,33,18,1,single,primary,earth,wood,yes,yes,0,0,skilled,2,m,Nyemba,"[25,35)","[0,4)"
 0,0,31,27,0,married,lower_secondary,wood_mud,charcoal,yes,yes,0,1,skilled,3,m,Nyemba,"[35,45)","[7,10)"
 0,0,35,25,0,widowed,primary,coated_adobe,wood,yes,no,1,0,self_agriculture,2,f,Nyemba,"[45,55)","[7,10)"
-0,NA,0,23,0,married,lower_secondary,wood_mud,charcoal,yes,yes,0,1,skilled,3,m,Nyemba,"[35,45)","[0,4)"
 0,0,37,24,0,married,primary,coated_adobe,wood,yes,no,1,0,sales,2,f,Nyemba,"[45,55)","[7,10)"
 0,0,37,25,0,married,lower_secondary,coated_adobe,wood,yes,yes,1,0,self_agriculture,3,m,Nyemba,"[35,45)","[7,10)"
 0,0,38,28,0,married,lower_secondary,coated_adobe,wood,yes,yes,1,0,sales,3,f,Nyemba,"[35,45)","[4,7)"

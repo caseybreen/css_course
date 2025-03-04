@@ -30,7 +30,7 @@ There are many different methods for generating survey weights, and each method 
 
 This (simulated) convenience sample was conducted at a coffee shop. The goal of survey was to estimate the average daily coffee consumption in cups among adults in Mochatown. Respondents age 18+ who consented to participate in the study were asked about their age, income, and daily coffee consumption.
 
-To construct the poststratification weights, we have also obtained auxiliary city-level data on the proportion of people aged 18+ in each age X income group ("strata") in Melbourne. We will use this auxiliary data to help construct the poststratification weights.
+To construct the poststratification weights, we have also obtained auxiliary city-level data on the proportion of people aged 18+ in each age X income group ("strata") in Mochatown. We will use this auxiliary data to help construct the poststratification weights.
 
 ```{r, output = F}
 ## library packages 
@@ -92,7 +92,7 @@ sample_proportion <- coffee_shop_sample %>%
 ## join population proportions together 
 poststrat_weights <- sample_proportion %>% 
   inner_join(pop_proportion, by = join_by(age_group, income_group)) %>% 
-  mutate(weight =  pop_proportion / sample_proportion) %>%      ## calculate weight 
+  mutate(weight =  pop_proportion / sample_proportion) %>%   ## calculate weight 
   select(age_group, income_group, weight)
 
 ```
@@ -163,6 +163,7 @@ To begin, we will read in the data we'll need for this analysis:
 ## quota sample 
 quota_sample <- read_csv("../../data/network_survival_quota_sample.csv") 
 
+
 ## read in poststratification weights (update path)
 poststrat_weighting_targets <- read_csv("../../data/weighting_targets_poststrat.csv")
 
@@ -203,12 +204,44 @@ where
 Let's describe this equation in words. To calculate a death rate, we require two pieces of information:
 
 -   Number of deaths: this is simply the weighted total number of kin (neighbour) deaths reported by everyone in the sample.
-
-<!-- -->
-
 -   Measure of exposure: this is the sum of the weighted total number of kin (neighbours) reported by everyone in the sample, multiplied by their number of days of exposure they're reporting on (120 days, in this study).
 
 The crude death rate is then obtained by dividing the total number of deaths by the total exposure and multiplying by 10,000 to express the rate in deaths per 10,000 person days.
+
+### Exercises 2 - warm up
+
+The variables in this dataset are named intuitively.
+
+-   On average, how many deaths did respondents report in their kin networks? In their neighbor networks?
+
+-   On average, how large are kin and neighbor networks?
+
+-   Using `ggplot` and `geom_histogram(aes(x = <variable>)`, make a histogram of the distribution of the degree of the kin and neighbour networks.
+
+```{r}
+## average number of deaths reported in networks 
+quota_sample %>% 
+  summarize(mean(num_deaths_kin), mean(num_deaths_neighbours))
+
+
+## average number of deaths reported in networks 
+quota_sample %>% 
+  summarize(mean(num_total_kin), mean(num_total_neighbour),
+            max(num_total_kin), max(num_total_neighbour))
+
+## histogram of neighbor 
+quota_sample %>% 
+  ggplot(aes(x = num_total_neighbour)) + 
+  geom_histogram(fill = "grey", color = "black") + 
+  theme_cowplot()
+
+## histogram of kin 
+quota_sample %>% 
+  ggplot(aes(x = num_total_kin)) + 
+  geom_histogram(fill = "grey", color = "black") + 
+  theme_cowplot()
+
+```
 
 We will compute this separately for the kin and neighbour ties, producing two distinct estimates of the crude death rate.
 
@@ -281,6 +314,8 @@ cdr_unweighted <- bind_rows(kin_estimates, neighbour_estimates) %>%
 ## rpint out death rate estimates 
 cdr_unweighted
 ```
+
+What's the estimate death rate among kin? What's the estimated death rate among neighbours?
 
 #### Poststratification weights
 
@@ -387,11 +422,11 @@ Our poststratification weights increased our estimates of the crude death rate, 
 
 ## Inverse probability weights (IPW)
 
-Our poststratification weights only account for age class and gender. But there might be important selection along other dimensions. For example, we may suspect that wealthier individuals are more likely to have social networks with lower mortality.
+Our poststratification weights only account for age and gender. But there might be important selection along other dimensions. For example, we may suspect that higher socioeconomic status individuals are more likely to have social networks with lower mortality.
 
 To better adjust for this, we need our weighting strategy to account for additional dimensions of selection into our sample. However, the challenge with poststratification weighting is the "curse of dimensionality": as the number of stratification variables increases, cells become sparse and can produce extremely large and unstable weights.
 
-Instead of poststratification, we will use inverse-probability weighting (IPW) to estimate each respondent's probability of inclusion in the non-probability sample. Here, we have collected an auxiliary probability-based sample to help with reweighting. The inverse probability weighting will proceed in three steps:
+Instead of poststratification, we will use inverse probability weighting (IPW) to estimate each respondent's probability of inclusion in the non-probability sample. Here, we have collected an auxiliary probability-based sample to help with reweighting. The inverse probability weighting will proceed in three steps:
 
 1.  Append together our non-probability (quota) sample and our auxiliary probability sample
 2.  Fit a logistic regression predicting inclusion probability in the non-probability sample
@@ -429,8 +464,8 @@ Now let's create a histogram of our inverse probability weights (IPW).
 ```{r}
 ## histogram of weights 
 quota_sample %>% 
-  ggplot() +  
-  geom_histogram(aes(x = weight_ipw)) +
+  ggplot(aes(x = weight_ipw)) +  
+  geom_histogram(color = "black", fill = "grey") +
   theme_cowplot()
 ```
 
