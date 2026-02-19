@@ -1,0 +1,60 @@
+---
+title: "R Notebook"
+author: Casey Breen 
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+df <- read_csv("~/Downloads/idhs_00002.csv.gz")
+```
+
+## number of rows and columns 
+
+```{r}
+nrow(df)
+
+ncol(df)
+```
+
+## Visualize 
+
+First, we want to make a histogram of age 
+
+```{r}
+df %>% 
+  ggplot(aes(x = AGE)) + 
+  geom_histogram(binwidth = 1, color = "black", fill = "grey") + 
+  cowplot::theme_cowplot()
+```
+
+```{r}
+## step 1 
+deal_kid_by_age <- df %>% 
+  filter(IDEALKID < 50) %>% 
+  group_by(AGE) %>% 
+  summarize(ideal_children_avg = mean(IDEALKID))
+
+## step 2 
+deal_kid_by_age %>% 
+  ggplot(aes(x = AGE, y = ideal_children_avg)) + 
+  geom_point(size = 2) + 
+  geom_line(size = 1) + 
+  cowplot::theme_cowplot() + 
+  labs(x = "Age", y = "Ideal Children") 
+  
+  
+  
+## basic scatterplot 
+df %>% 
+  filter(IDEALKID < 50) %>% 
+  ggplot(aes(x = AGE, y = IDEALKID)) + 
+  geom_point() + 
+  geom_smooth() + 
+  cowplot::theme_cowplot()
+```
+
+

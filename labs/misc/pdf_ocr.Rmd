@@ -1,0 +1,54 @@
+---
+title: "Text demo"
+author: Casey Breen
+---
+
+Summary: In this notebook, we'll read in PDF files. 
+
+```{r}
+library(tesseract)
+library(tidytext)
+library(tidyverse)
+
+
+eng <- tesseract("eng")
+```
+
+
+```{r}
+text <- tesseract::ocr("http://jeroen.github.io/images/testocr.png", engine = eng)
+cat(text)
+```
+## Now find
+
+
+```{r}
+pngfile <- pdftools::pdf_convert('~/Downloads/service-ll-usrep-usrep095-usrep095670-usrep095670.pdf', dpi = 600)
+```
+
+
+```{r}
+text <- tesseract::ocr(pngfile)
+
+cat(text[1])
+```
+
+
+
+```{r}
+## First put it into a data.frame 
+df <- tibble(doc = 1, text = text[1])
+
+## split into one word (token) per row
+tokens <- df %>% 
+  tidytext::unnest_tokens(word, text)
+
+
+words <- tokens %>% 
+  count(word, sort = TRUE) %>% 
+  filter(nchar(word) > 5)
+
+## create a plot 
+
+```
+

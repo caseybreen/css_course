@@ -47,6 +47,7 @@ We can load these from a separate credentials script. You'll need to update the 
 ## give path to credentials file -- this is a preferred solution so that we don't publicly release credentials 
 source("../../private/credentials_group5.R") 
 
+
 #### Alternatively, directly supply credentials/version
 # VERSION = 
 # CREATION_ACT = 
@@ -107,9 +108,42 @@ For simplicity, we'll focus on **`estimate_mau_upper_bound`** for the rest of th
 ```{r}
 ## exercise 1.1 
 
+## All Facebook users in Great Britain between ages of 18 and 65 
+fb_mau_users_france <- query_fb_marketing_api(
+  location_unit_type = "countries",
+  location_keys = "FR",
+  age_min = 18, 
+  age_max = 65,
+  version = VERSION,
+  creation_act = CREATION_ACT,
+  token = TOKEN)
+
+fb_mau_users_france$estimate_mau_upper_bound
+
+fb_mau_users_france %>% select(estimate_mau_upper_bound)
 
 ## exercise 1.2
 
+fb_mau_users_gb_30_40 <- query_fb_marketing_api(
+  location_unit_type = "countries",
+  location_keys = "GB",
+  age_min = 30, 
+  age_max = 40,
+  version = VERSION,
+  creation_act = CREATION_ACT,
+  token = TOKEN)
+
+
+fb_mau_users_gb_40_50 <- query_fb_marketing_api(
+  location_unit_type = "countries",
+  location_keys = "GB",
+  age_min = 40, 
+  age_max = 50,
+  version = VERSION,
+  creation_act = CREATION_ACT,
+  token = TOKEN)
+
+fb_mau_users_gb_30_40$estimate_mau_upper_bound - fb_mau_users_gb_40_50$estimate_mau_upper_bound
 
 ```
 
@@ -179,8 +213,6 @@ for (i in seq_along(age_groups)) {
 
 # Combine all results into a single dataframe (if needed)
 india_age_mau <- bind_rows(results)
-
-
 ```
 
 ## Visualization monthly active user age patterns
@@ -197,6 +229,8 @@ india_age_mau <- india_age_mau %>%
     gender == 1 ~ "Men",
     gender == 2 ~ "Women"
   ))
+
+india_age_mau %>% count(gender_recode, gender)
 ```
 
 We'll data visualizations to gain insight into the relationship between age/gender and FB usage. The first visualization is a basic plot you might make for yourself when you're doing some quick exploratory data analysis. It shows the relationship between age range and the mau upper bound. The second is a more polished figure that you might include in a publication.
@@ -303,7 +337,7 @@ all_countries_gender_wide %>%
 
 ## Fancy plot 
 all_countries_gender_wide %>% 
-  ggplot(aes(x = facebook_mau_gender_ratio, y = internet_gender_gap, label = location_keys)) + 
+  ggplot(aes(x = facebook_mau_gender_ratio, y = internet_gender_gap, label = location_keys)) +
   geom_text() + 
   ylim(0, 1.5) + 
   xlim(0, 1.5) + 
@@ -316,13 +350,38 @@ all_countries_gender_wide %>%
 ## Exercise 3
 
 1.  Calculate the correlation between the MAU gender gap and the Internet gender gap.
-2.  In what settings would the FB gender gap not be a good predictor of internet gender gaps? What other predictors might be used in conjunction with the Facebook gender gap data to predict internet gender gaps?
+2.  Make a bar plot of the Female MAU in each country. Make a bar plot of Male MAU in each country. Bonus: Make one plot with both male and female using different colors. (Note: you will need a long data file)
+3.  In what settings would the FB gender gap not be a good predictor of internet gender gaps? What other predictors might be used in conjunction with the Facebook gender gap data to predict internet gender gaps?
 
 ```{r}
 ## 3.1 
 # Hint: 
-# all_countries_gender_wide %>%
-#   summarize(cor(___, ___))
+all_countries_gender_wide %>%
+  summarize(cor(facebook_mau_gender_ratio, internet_gender_gap))
+
+all_countries_gender %>% 
+  filter(gender == 1) %>% 
+  ggplot(aes(x = location_keys, y = estimate_mau_upper_bound)) + 
+  geom_col(position = position_dodge(1)) + 
+  cowplot::theme_cowplot() + 
+  scale_y_continuous(labels = scales::comma, limits = c(0, NA)) + 
+  labs(x = "Country", y = "FB Users")
+
+all_countries_gender %>% 
+  filter(gender == 2) %>% 
+  ggplot(aes(x = location_keys, y = estimate_mau_upper_bound)) + 
+  geom_col(position = position_dodge(1)) + 
+  cowplot::theme_cowplot() + 
+  theme(legend.position = "bottom") + 
+  scale_y_continuous(labels = scales::comma, limits = c(0, NA))
+
+all_countries_gender %>% 
+  ggplot(aes(x = location_keys, y = estimate_mau_upper_bound, fill = gender)) + 
+  geom_col(position = position_dodge(1)) + 
+  cowplot::theme_cowplot() + 
+  theme(legend.position = "bottom") + 
+  scale_y_continuous(labels = scales::comma, limits = c(0, NA))
+
 ```
 
 ## Backup data
