@@ -6,12 +6,14 @@ author: Casey Breen
 Summary: In this notebook, we'll read in PDF files. 
 
 ```{r}
-## Library packages (you'll have to do this if you)
+## Library packages (you'll have to install these if you haven't already)
+library(tidyverse)
 library(tesseract)
 library(tidytext)
 library(tidyverse)
 library(pdftools)
 
+## set engine for OCR
 eng <- tesseract("eng")
 ```
 ## Images 
@@ -19,7 +21,10 @@ eng <- tesseract("eng")
 First, test this out with a .png or jpeg file. You can just give it the image URL directly. 
 
 ```{r}
+## read in image 
 text <- tesseract::ocr("http://jeroen.github.io/images/testocr.png", engine = eng)
+
+## print out text
 cat(text)
 ```
 ## PDF Files 
@@ -27,14 +32,16 @@ cat(text)
 Now we'll work with a pdf file. First, we'll need to convert the PDF to an image file. 
 
 ```{r}
+## convert to PDF
 pngfile <- pdftools::pdf_convert('~/Downloads/service-ll-usrep-usrep095-usrep095670-usrep095670.pdf', dpi = 600)
 ```
 Now, we can use the OCR function from tesseract. 
 
 ```{r}
-## read in the 
+## Perform OCR
 text <- tesseract::ocr(pngfile)
 
+## print out page 4
 cat(text[4])
 ```
 
@@ -50,7 +57,7 @@ df <- tibble(doc = 1, text = text[1])
 tokens <- df %>% 
   tidytext::unnest_tokens(word, text)
 
-
+## create count of most common words over 5 characters
 words <- tokens %>% 
   count(word, sort = TRUE) %>% 
   filter(nchar(word) > 5)
