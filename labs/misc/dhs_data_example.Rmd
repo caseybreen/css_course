@@ -1,7 +1,9 @@
 ---
-title: "R Notebook"
+title: "DHS Analysis"
 author: Casey Breen 
 ---
+
+Summary: DHS analysis in class 
 
 ```{r}
 library(tidyverse)
