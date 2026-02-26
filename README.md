@@ -1,6 +1,6 @@
-# Topics in Computational Social Science - Hilary Term, 2024
+# Topics in Computational Social Science - UT Austin, Spring 2026
 
-Instructors: [Casey Breen](https://www.caseybreen.com/), [Ridhi Kashyap](https://scholar.google.co.uk/citations?user=9oExhHsAAAAJ&hl=en)
+Instructors: [Casey Breen](https://www.caseybreen.com/)
 
 This is the repository for the "Topics in Computational Social Science" course. 
 
