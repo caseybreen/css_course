@@ -6,11 +6,10 @@ author: Casey Breen
 Summary: DHS analysis in class 
 
 ```{r}
+## library packages 
 library(tidyverse)
-```
 
-
-```{r}
+## read in data file 
 df <- read_csv("~/Downloads/idhs_00002.csv.gz")
 ```
 
@@ -18,7 +17,6 @@ df <- read_csv("~/Downloads/idhs_00002.csv.gz")
 
 ```{r}
 nrow(df)
-
 ncol(df)
 ```
 
@@ -32,6 +30,8 @@ df %>%
   geom_histogram(binwidth = 1, color = "black", fill = "grey") + 
   cowplot::theme_cowplot()
 ```
+
+Now we want to create a scatter plot of ideal family size (IDEALKID) by AGE. 
 
 ```{r}
 ## step 1 
@@ -47,7 +47,6 @@ deal_kid_by_age %>%
   geom_line(size = 1) + 
   cowplot::theme_cowplot() + 
   labs(x = "Age", y = "Ideal Children") 
-  
   
   
 ## basic scatterplot 

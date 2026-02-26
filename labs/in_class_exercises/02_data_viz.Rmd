@@ -7,9 +7,13 @@ Summary: Read in some data, make some plots
 
 
 ```{r}
+## library packages 
 library(tidyverse)
 library(cowplot)
 library(here)
+
+## source a custom function from github for recoding education
+source( "https://raw.githubusercontent.com/caseybreen/censocdev/master/R/recode_education.R")
 ```
 
 ## three ways to read in data 
@@ -23,64 +27,80 @@ censoc <- read_csv("../../data/censoc_numident_demo_v2.1.csv")
 
 ## using here() package 
 censoc <- read_csv(here("data", "censoc_numident_demo_v2.1.csv"))
+
+
+censoc <- censoc %>% 
+  recode_education(educ_var = "educd")
 ```
 
 
 ## data visualization 
 
-I think there's 5 main plots I use over and over again. These are approximately 90% of the data visualizations 
+There's 5 main plots I use over and over again in all of my papers. These are approximately 90% of the data visualizations I make. 
 
 
 ```{r}
-## 1. histogram 
-censoc %>% 
+## 1. Histogram 
+histogram <- censoc %>% 
   ggplot(aes(x = death_age)) + 
   geom_histogram(color = "black", fill = "grey") + 
-  theme_cowplot()
+  theme_cowplot() + 
+  labs(x = "Death Age", y = "Count")
 
+histogram
 
-## 2. scatter plot 
-censoc %>% 
+## 2. Scatter plot 
+scatter_plot <- censoc %>% 
   sample_n(1000) %>% 
   ggplot(aes(x = serial, y = death_age)) + 
   geom_point() + 
   geom_smooth() + 
-  theme_cowplot()
+  theme_cowplot() + 
+  labs(x = "Serial", y = "Death Age")
 
+scatter_plot
   
-## 3. column plot 
+## 3. Column plot 
+# prep data 
 top_10_states <- censoc %>% 
   count(socstate_string) %>% 
   arrange(desc(n)) %>% 
   top_n(10)
 
-top_10_states %>% 
+# make plot 
+column_plot <- top_10_states %>% 
   ggplot(aes(x = socstate_string, y = n)) + 
   geom_col(alpha = 0.6, fill = "darkred") + 
   geom_text(aes(label = n, y = 300)) + 
   theme_cowplot() +
   theme(axis.text.x = element_text(angle = -45, vjust = 0.5, hjust=0)) + 
-  labs(x = "Social Security State", y = "Count")
+  labs(x = "State", y = "Count")
 
+column_plot
 
-## 4. dot plot 
+## 4. Dot plot (coefficient plot, if plotting reg coefficients)
+# prep data 
 avg_death_age_df <- censoc %>% 
   filter(socstate_string %in% top_10_states$socstate_string) %>% 
   group_by(socstate_string) %>% 
   summarize(death_age_avg = mean(death_age),
             death_age_std = sd(death_age)/sqrt(n()))
 
-
-avg_death_age_df %>% 
+# make plot 
+dot_plot <- avg_death_age_df %>% 
   ggplot(aes(y = reorder(socstate_string, death_age_avg), 
              x = death_age_avg,
              xmin = death_age_avg - 1.96 * death_age_std,
              xmax = death_age_avg + 1.96 * death_age_std)) + 
   geom_pointrange(shape = 21, fill = "white") + 
-  theme_cowplot()
+  theme_cowplot() +
+  labs(x = "Death Age", y = "State")
+
+dot_plot
 
 
-## 5. line plot
+## 5. Line plot
+# prep data 
 avg_edu_df <- censoc %>% 
   filter(byear %in% c(1900:1920)) %>% 
   group_by(byear) %>% 
@@ -88,69 +108,20 @@ avg_edu_df <- censoc %>%
   summarize(edu_attainment = mean(educ_yrs),
             edu_attainment_sd = sd(educ_yrs)/sqrt(n()))
 
-
-avg_edu_df %>% 
+# make plot 
+line_plot <- avg_edu_df %>% 
   ggplot(aes(x = byear, y = edu_attainment, fill = byear)) + 
   geom_line() + 
   geom_point(size = 3, shape = 21) + 
   theme_cowplot() + 
-  ylim(0, NA)
+  labs(x = "Birth Year", y = "Educational Attainment")
+
+line_plot
+
   
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```{r}
-## function for recoding education
-recode_education <- function(df, educ_var) {
-
-  df <- df  %>%
-    mutate(educ_variable = !!sym(educ_var)) %>%
-    mutate(educ_yrs = case_when(
-      educ_variable == 2 ~ 0,
-      educ_variable == 12 ~ 0,
-      educ_variable == 14 ~ 1,
-      educ_variable == 15 ~ 2,
-      educ_variable == 16 ~ 3,
-      educ_variable == 17 ~ 4,
-      educ_variable == 22 ~ 5,
-      educ_variable == 23 ~ 6,
-      educ_variable == 25 ~ 7,
-      educ_variable == 26 ~ 8,
-      educ_variable == 30 ~ 9,
-      educ_variable == 40 ~ 10,
-      educ_variable == 50 ~ 11,
-      educ_variable == 60 ~ 12,
-      educ_variable == 70 ~ 13,
-      educ_variable == 80 ~ 14,
-      educ_variable == 90 ~ 15,
-      educ_variable == 100 ~ 16,
-      educ_variable == 110 ~ 17,
-      educ_variable == 111 ~ 17,
-      educ_variable == 112 ~ 17,
-      educ_variable == 113 ~ 17
-    )) %>%
-    select(-educ_variable)
-
-  return(df)
-
-}
-
-censoc <- censoc %>% 
-  recode_education(educ_var = "educd")
-
+cowplot::plot_grid(histogram, scatter_plot, column_plot, dot_plot, line_plot, labels = "AUTO")
 ```
 

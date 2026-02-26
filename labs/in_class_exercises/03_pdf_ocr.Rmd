@@ -1,0 +1,66 @@
+---
+title: "Text demo"
+author: Casey Breen
+---
+
+Summary: In this notebook, we'll read in PDF files. 
+
+```{r}
+## Library packages (you'll have to do this if you)
+library(tesseract)
+library(tidytext)
+library(tidyverse)
+library(pdftools)
+
+eng <- tesseract("eng")
+```
+## Images 
+
+First, test this out with a .png or jpeg file. You can just give it the image URL directly. 
+
+```{r}
+text <- tesseract::ocr("http://jeroen.github.io/images/testocr.png", engine = eng)
+cat(text)
+```
+## PDF Files 
+
+Now we'll work with a pdf file. First, we'll need to convert the PDF to an image file. 
+
+```{r}
+pngfile <- pdftools::pdf_convert('~/Downloads/service-ll-usrep-usrep095-usrep095670-usrep095670.pdf', dpi = 600)
+```
+Now, we can use the OCR function from tesseract. 
+
+```{r}
+## read in the 
+text <- tesseract::ocr(pngfile)
+
+cat(text[4])
+```
+
+## Analysis
+
+Finally, we can do some basic analysis of the text... 
+
+```{r}
+## First put it into a data.frame 
+df <- tibble(doc = 1, text = text[1])
+
+## split into one word (token) per row
+tokens <- df %>% 
+  tidytext::unnest_tokens(word, text)
+
+
+words <- tokens %>% 
+  count(word, sort = TRUE) %>% 
+  filter(nchar(word) > 5)
+```
+
+Exercises: 
+
+1. Find a new image from the internet and see how well we can process its text. 
+
+2. Create a bar plot (geom_col) of the top 10 words over 5 letters in the 3rd page of the UNITED STATES v. Fox document. 
+
+3. Bonus: Find a new PDF, scan it in, and find the top 10 words over 5 letters. How do they compare. 
+
