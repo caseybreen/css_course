@@ -5,7 +5,6 @@ author: Casey Breen
 
 Summary: Read in some data, make some plots 
 
-
 ```{r}
 ## library packages 
 library(tidyverse)
@@ -13,8 +12,9 @@ library(cowplot)
 library(here)
 
 ## source a custom function from github for recoding education
-source( "https://raw.githubusercontent.com/caseybreen/censocdev/master/R/recode_education.R")
+source("https://raw.githubusercontent.com/caseybreen/censocdev/master/R/recode_education.R")
 ```
+
 
 ## three ways to read in data 
 
