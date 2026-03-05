@@ -313,7 +313,8 @@ Download the `css_lab2_subnational_internet.csv` file from the canvas page and r
 ```{r}
 ## read in data 
 ## you'll need to update this path 
-internet_df <- read_csv("~/Downloads/css_lab2_subnational_internet.csv")
+internet_df <-read_csv("~/Downloads/css_lab2_subnational_internet.csv")
+
 ```
 
 ### Feature Definitions

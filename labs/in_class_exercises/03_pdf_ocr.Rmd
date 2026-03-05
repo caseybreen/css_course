@@ -22,7 +22,7 @@ First, test this out with a .png or jpeg file. You can just give it the image UR
 
 ```{r}
 ## read in image 
-text <- tesseract::ocr("http://jeroen.github.io/images/testocr.png", engine = eng)
+text <- tesseract::ocr("https://i.pinimg.com/736x/06/dd/5a/06dd5a642a9c37906d69227152eb9fc0.jpg", engine = eng)
 
 ## print out text
 cat(text)
@@ -33,7 +33,7 @@ Now we'll work with a pdf file. First, we'll need to convert the PDF to an image
 
 ```{r}
 ## convert to PDF
-pngfile <- pdftools::pdf_convert('~/Downloads/service-ll-usrep-usrep095-usrep095670-usrep095670.pdf', dpi = 600)
+pngfile <- pdftools::pdf_convert('~/Downloads/court_doc.pdf', dpi = 600)
 ```
 Now, we can use the OCR function from tesseract. 
 
@@ -61,6 +61,10 @@ tokens <- df %>%
 words <- tokens %>% 
   count(word, sort = TRUE) %>% 
   filter(nchar(word) > 5)
+
+words %>% 
+  arrange(desc(n)) %>% 
+  slice_head(n = 10)
 ```
 
 Exercises: 
