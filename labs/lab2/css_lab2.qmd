@@ -209,9 +209,9 @@ Let's use the functions we just created to calculate model performance metrics f
 ```{r}
 ## Calculate mae, mse, and r_squared 
 lm_model_performance <- sim_data_test_w_predictions %>% 
-  summarize(rmse = rmse(stress, predicted_stress),
-            mae = mae(stress, predicted_stress),
-            r_squared = r_squared(stress, predicted_stress))
+  summarize(rmse = rmse(actual = stress, predicted = predicted_stress),
+            mae = mae(actual = stress, predicted = predicted_stress),
+            r_squared = r_squared(actual = stress, predicted_stress))
 
 ## print our lm model performance
 lm_model_performance
@@ -283,6 +283,14 @@ This quick visual inspection suggests that our random forest model is performing
 (i) Mean Absolute Error (MAE)
 (ii) Root Mean Squared Error (RMSE)
 (iii) $R^2$ (Coefficient of Determination)
+(iv) 
+
+```{r}
+sim_data_test_rf_predictions %>% 
+  summarize(rmse = rmse(actual = stress, predicted = predicted_stress_rf),
+            mae = mae(actual = stress, predicted = predicted_stress_rf),
+            r_squared = r_squared(stress, predicted_stress_rf))
+```
 
 **1.2** Does the random forest model or linear regression model have better predictive accuracy? Compare their MAE, RMSE, and $R^2$. Does it matter which error metric we use?
 
@@ -293,6 +301,17 @@ $$
 $$
 
 Write a function to calculate bias (hint: modify the mean absolute error function). Apply this function to predictions from both the linear model and random forest model. Do either of the models systematically over- or under-predict?
+
+```{r}
+# Function to compute bias
+ba <- function(actual, predicted){
+  mean(predicted - actual)
+}
+
+
+sim_data_test_rf_predictions %>% 
+  summarize(bias = ba(actual = stress, predicted = predicted_stress_rf))
+```
 
 # Exercise 2 - Predicting Subnational Internet Adoption
 
@@ -484,6 +503,86 @@ To replicate this scenario, we can employ leave-one-country-out cross-validation
 
 **2.1** Test the performance of our model using leave-one-country-out cross-validation. Here, we'll split into folds based on country (rather than random). Calculate MAE, RMSE, and $R^2$.
 
+```{r}
+## create folds 
+folds_count_loco <- group_vfold_cv(internet_df, group = country)
+folds_loco 
+
+# Define a random forest model specification (same as above)
+rf_spec <- rand_forest(mtry = 3, trees = 500, min_n = 5) %>%
+  set_engine("ranger") %>%
+  set_mode("regression")
+
+
+## Define a random forest specification 
+rf_res_loco <- fit_resamples(
+  rf_spec,
+  perc_used_internet_past12months_wght_age_15_to_49_wom ~ fb_pntr_18p_female + subnational_hdi_females + nl_mean_zscore,
+  resamples = folds_loco,
+  metrics = metric_set(yardstick::rmse, yardstick::mae, yardstick::rsq)
+)
+
+## get error metrics  
+error_metrics_loco <- collect_metrics(rf_res) %>% 
+  mutate(cv_method = "leave-one-country-out")
+
+## print out error metrics 
+error_metrics_loco
+```
+
 **2.2** When we use leave-one-country-out cross-validation, does the model perform better or worse? Is this consistent across all three error metrics? Why might this be?
 
 **2.3** Create a calibration plot with our observed (x-axis) and predicted (y-axis) values for both 10-fold cross-validation and leave-one-country-out cross-validation.
+
+```{r}
+# Define a random forest specification 
+rf_res_loco_cv_fold <- fit_resamples(
+  rf_spec,
+  perc_used_internet_past12months_wght_age_15_to_49_wom ~ fb_pntr_18p_female + subnational_hdi_females + nl_mean_zscore,
+  resamples = folds_loco,
+  control = control_resamples(save_pred = TRUE), ## this 
+  metrics = metric_set(yardstick::rmse, yardstick::mae, yardstick::rsq)
+)
+
+## collect predictions from leave-one-country-out cross-validation
+loco_predictions <- collect_predictions(rf_res_loco_cv_fold)
+
+## create calibration plot 
+loco_calibration_plot <- loco_predictions %>% 
+  ggplot(aes(x = perc_used_internet_past12months_wght_age_15_to_49_wom, y = .pred)) + 
+  geom_point() + 
+  geom_abline(slope = 1, linetype = "dashed", color = "red") + 
+  theme_cowplot() + 
+  labs(title = "Leave-one-country-out CV")
+
+loco_calibration_plot
+```
+
+```{r}
+## fit 10-fold calibration plot 
+rf_res_10_fold <- fit_resamples(
+  rf_spec,
+  perc_used_internet_past12months_wght_age_15_to_49_wom ~ fb_pntr_18p_female + subnational_hdi_females + nl_mean_zscore,
+  resamples = folds,
+  control = control_resamples(save_pred = TRUE),
+  metrics = metric_set(yardstick::rmse, yardstick::mae, yardstick::rsq)
+)
+
+## plot predictions 
+fold_10_predictions <- collect_predictions(rf_res_10_fold)
+
+## create plot 
+fold_10_plot <- fold_10_predictions %>% 
+  ggplot(aes(x = perc_used_internet_past12months_wght_age_15_to_49_wom, y = .pred)) + 
+  geom_point() + 
+    geom_abline(slope = 1, linetype = "dashed", color = "red") + 
+  theme_cowplot() + 
+  labs(title = "10-Fold CV")
+
+## print calibration plot 
+fold_10_plot
+```
+
+```{r}
+cowplot::plot_grid(loco_calibration_plot, fold_10_plot)
+```

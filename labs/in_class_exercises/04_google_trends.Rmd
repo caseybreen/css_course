@@ -1,0 +1,175 @@
+---
+title: "Query google trends"
+author: Casey Breen
+---
+
+Summary: In this notebook, we'll use the `gtrendsR` package to look at trends in Google search intensity. Such data can be useful for identifying sudden shocks or shifts in public attention as reflected in search activity. Of course, such data is imperfect (recall the Google Flu paper), but it can still be a helpful proxy. 
+
+The search intensity returned by this package (which queries an API from Google) is normalized to the maximum value for any term. 
+
+
+```{r}
+## library packages 
+library(tidyverse)
+library(gtrendsR) ## install this if your don't already 
+library(ggrepel)
+library(zoo)
+library(here)
+
+## custom color palette
+cud <- c("#D55E00", "#56B4E9", "#009E73", "#CC79A7", "#0072B2", "#E69F00", "#F0E442", "#999999")
+
+```
+
+
+First, we'll look at some keywords related to adoption of modern birth control. We'll focus on Nigeria. 
+
+```{r}
+## maximum 5 terms 
+keywords <- c("postinor", "birth control", "iud", "depo", "implant")
+
+## run the gtrends command to query the api 
+res <- gtrends(keyword = keywords, geo = c("NG"), time = "2009-01-01 2018-01-01")
+
+## look at what it returns... lots of into! 
+res
+
+## focus just on interest over time, calculate rolling mean over 12 months 
+## then normalize to 1 and 0 
+df_contraception <- res$interest_over_time %>%
+  arrange(keyword, date) %>%
+  group_by(keyword) %>%
+  mutate(
+    hits_roll52 = zoo::rollmean(hits, k = 12, fill = 0, align = "right")
+  ) %>%
+  ungroup() %>% 
+  mutate(hits_roll52 = hits_roll52/max(hits_roll52))
+
+# data for end labels
+df_labels_contraception <- df_contraception %>%
+  filter(!is.na(hits_roll52)) %>%
+  group_by(keyword) %>%
+  slice_max(date, n = 1, with_ties = FALSE) %>%
+    mutate(date = as_datetime("2018-09-01")) %>% 
+  ungroup()
+
+## create visualization 
+contraception_fig <- df_contraception %>% 
+  filter(date > "2009-12-01") %>% 
+  ggplot(aes(x = date)) + 
+  geom_line(aes(y = hits_roll52, color = keyword), linewidth = 1) +
+  labs(
+    x = "Date",
+    y = "Relative Search Intensity",
+    title = "Contraception"
+  ) +
+  cowplot::theme_cowplot() +
+  scale_color_manual(values = cud) +
+  geom_text_repel(
+    data = df_labels_contraception,
+        fontface = "bold",
+  bg.color = "white",
+  bg.r = 0.1,
+    aes(
+      x = date ,   # push labels to right side
+      y = hits_roll52,
+      label = keyword,
+      color = keyword
+    ),
+    direction = "y",
+    hjust = 0,
+    segment.color = NA,
+    show.legend = FALSE
+  ) +
+  theme(legend.position = "NA")
+  
+## print out figure 
+contraception_fig
+```
+
+Now we'll look at a different set of keywords that potentially correlate with family planning and thinking about advantages of different family sizes. 
+
+```{r}
+normative <- c("nuclear family", "big family", "small family", "family size", "child spacing")
+
+res_norm <- gtrends(keyword = normative, geo = c("NG"), time = "2010-01-01 2018-01-01")
+
+## df 
+df <- bind_rows(
+  mutate(res_norm$interest_over_time, source = "res"),
+) %>%
+  arrange(keyword, date) %>%
+  group_by(keyword) %>%
+  mutate(
+    hits_roll52 = zoo::rollmean(hits, k = 12, fill = 0, align = "right")
+  ) %>%
+  ungroup() %>% 
+    mutate(hits_roll52 = hits_roll52/max(hits_roll52))
+
+
+# data for end labels
+df_labels <- df %>%
+  filter(date > "2009-12-01") %>%
+  filter(!is.na(hits_roll52)) %>%
+  group_by(keyword) %>%
+  slice_max(date, n = 1, with_ties = FALSE) %>%
+  mutate(date = as_datetime("2018-09-01")) %>% 
+  ungroup()
+
+## create visualization 
+normative_family_size_fig <- df %>% 
+  filter(date > "2009-12-01") %>% 
+  ggplot() + 
+  geom_line(aes(x = date, y = hits_roll52, color = keyword), linewidth = 1) +
+  labs(
+    x = "Date",
+    y = "Relative Search Intensity",
+    title = "Family Size/Timing"
+  ) +
+  cowplot::theme_cowplot() +
+    scale_color_manual(values = cud) +
+  geom_text_repel(
+    data = df_labels,
+    fontface = "bold",
+  bg.color = "white",
+  bg.r = 0.1,
+    aes(
+      x = date,
+      y = hits_roll52,
+      label = keyword,
+      color = keyword
+    ),
+    direction = "y",
+    hjust = 0,
+    segment.color = NA,
+    show.legend = FALSE
+  ) +
+  theme(legend.position = "NA")
+```
+
+
+## combine figures and plot 
+
+```{r}
+## plot fig 
+google_trends_plot <- cowplot::plot_grid(normative_family_size_fig, contraception_fig, ncol = 1)
+
+google_trends_plot
+
+# Save plot out 
+ggsave(
+  plot = google_trends_plot,
+  filename = here("labs", "in_class_exercises", "google_trends_plot.png"),
+  height = 8,
+  width = 6,
+  bg = "white")
+```
+
+
+# Exercise 
+
+1. Try making your own plot using a maximum of 5 new keywords around a topic of your choice . Try varying country, dates, etc. What do you find? Create a title on your figure of: "First Name - Topic" 
+
+2. Save your figure using the `ggsave()` function shown above. Change the height/width as appropriate. 
+
+3. Create a single overleaf doc together as a group. Share that doc with all the other members of your group. Upload each one of your figures to the doc. Include them in your overleaf document using the `\begin{figure}` syntax. Create a caption for each figure, and size it appropriately.  
