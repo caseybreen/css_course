@@ -15,6 +15,7 @@ library(gtrendsR) ## install this if your don't already
 library(ggrepel)
 library(zoo)
 library(here)
+library(cowplot)
 
 ## custom color palette
 cud <- c("#D55E00", "#56B4E9", "#009E73", "#CC79A7", "#0072B2", "#E69F00", "#F0E442", "#999999")
