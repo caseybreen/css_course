@@ -35,7 +35,7 @@ res <- gtrends(keyword = keywords, geo = c("NG"), time = "2009-01-01 2018-01-01"
 res
 
 ## focus just on interest over time, calculate rolling mean over 12 months 
-## then normalize to 1 and 0 
+## then normalize to a 0 to 1 scale (1 = highest search intensity for those keywords)
 df_contraception <- res$interest_over_time %>%
   arrange(keyword, date) %>%
   group_by(keyword) %>%
@@ -156,7 +156,7 @@ google_trends_plot <- cowplot::plot_grid(normative_family_size_fig, contraceptio
 
 google_trends_plot
 
-# Save plot out 
+# Save plot to png file 
 ggsave(
   plot = google_trends_plot,
   filename = here("labs", "in_class_exercises", "google_trends_plot.png"),
