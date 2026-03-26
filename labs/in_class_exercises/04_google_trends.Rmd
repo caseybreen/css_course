@@ -160,10 +160,12 @@ google_trends_plot
 # Save plot to png file 
 ggsave(
   plot = google_trends_plot,
-  filename = here("labs", "in_class_exercises", "google_trends_plot.png"),
+  filename = here("google_trends_plot.png"),
   height = 8,
   width = 6,
   bg = "white")
+
+here()
 ```
 
 
