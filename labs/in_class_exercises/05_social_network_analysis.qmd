@@ -233,7 +233,7 @@ Next, we use `ggraph()` to create the network visualization and add layers step 
 
 1.2 What would happen if we remove Medici from the network? Run the code below and describe how the network has changed. Now which family appears to be the most important? Is the network more fragmented (i.e, contain more components)?
 
-1.3 Based on your answers to 1.1 and 1.2, describe two types of social capital theorized by Robert Putnam that the Medici family likely has. How do you know?
+1.3 Based on your answers to 1.1 and 1.2, how might the network position of the Medici family give them social capital?
 
 ```{r}
 ## First, drop the Medici family and recalculate centrality measures 
