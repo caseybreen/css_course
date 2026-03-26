@@ -16,6 +16,7 @@ We will complete two different exercises:
 
 1)  Explore how to analyze and visualize network data with the package `tidygraph`, using a historical Renaissance marriage network dataset.
 2)  Investigate how much homophily there is in our class's discussion networks using the survey data we collected in class
+3)  Bonus — shiny app on disease transmission
 
 # Exercise 1: Analyze network data
 

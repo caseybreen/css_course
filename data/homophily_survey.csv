@@ -1,0 +1,76 @@
+ego_id,date,ego_gender,ego_age,ego_classyear,ego_origin,ego_ai,alter_id,alter_classyear,alter_gender,alter_origin,alter_age,alter_ai
+1,2/26/2026,F,19,Sophomore,Austin,No,1,Teacher,F,Austin,53,Not a UT student
+1,2/26/2026,F,19,Sophomore,Austin,No,2,Sophomore,F,Austin,19,No
+1,2/26/2026,F,19,Sophomore,Austin,No,3,Sophomore,F,Austin,19,Yes
+1,2/26/2026,F,19,Sophomore,Austin,No,4,Junior,F,Austin,20,Yes
+1,2/26/2026,F,19,Sophomore,Austin,No,5,Teacher,M,Rest of Texas,55,Not a UT student
+2,2/26/2026,M,20,Junior,Rest of US,No,1,Sophomore,F,Rest of Texas,19,No
+2,2/26/2026,M,20,Junior,Rest of US,No,2,Junior,M,Rest of U.S.,21,No
+2,2/26/2026,M,20,Junior,Rest of US,No,3,Junior,M,Rest of U.S.,20,Not a UT student
+2,2/26/2026,M,20,Junior,Rest of US,No,4,Not in school,M,Rest of U.S.,54,Not a UT student
+2,2/26/2026,M,20,Junior,Rest of US,No,5,Junior,M,Rest of U.S.,20,Not a UT student
+3,2/26/2026,M,21,Senior,Rest of Texas,No,1,Junior,M,Austin,21,No
+3,2/26/2026,M,21,Senior,Rest of Texas,No,2,Senior,M,Rest of Texas,22,Not a UT student
+3,2/26/2026,M,21,Senior,Rest of Texas,No,3,Sophomore,M,Rest of Texas,19,No
+3,2/26/2026,M,21,Senior,Rest of Texas,No,4,Graduate,M,Rest of U.S.,21,No
+3,2/26/2026,M,21,Senior,Rest of Texas,No,5,Senior,M,Rest of World,22,No
+4,2/26/2026,F,20,Junior,Rest of Texas,No,1,Junior,F,Rest of Texas,21,No
+4,2/26/2026,F,20,Junior,Rest of Texas,No,2,Not in college,F,Rest of World,49,Not a UT student
+4,2/26/2026,F,20,Junior,Rest of Texas,No,3,Trade school,M,Rest of World,22,Not a UT student
+4,2/26/2026,F,20,Junior,Rest of Texas,No,4,Junior,F,Rest of Texas,21,No
+4,2/26/2026,F,20,Junior,Rest of Texas,No,5,Junior,F,Rest of Texas,20,No
+5,3/3/2026,F,22,Senior,Rest of Texas,No,1,Graduated,M,Rest of World,23,Not a UT student
+5,3/3/2026,F,22,Senior,Rest of Texas,No,2,Graduated,F,Rest of Texas,25,Not a UT student
+5,3/3/2026,F,22,Senior,Rest of Texas,No,3,Graduated,F,Rest of Texas,55,Not a UT student
+5,3/3/2026,F,22,Senior,Rest of Texas,No,4,Senior,F,Rest of Texas,22,Yes
+5,3/3/2026,F,22,Senior,Rest of Texas,No,5,Graduated,F,Rest of Texas,24,Not a UT student
+6,3/3/2026,M,21,Junior,Rest of world,No,1,not in university,M,Rest of World,24,Not a UT student
+6,3/3/2026,M,21,Junior,Rest of world,No,2,not in university,F,Rest of World,55,Not a UT student
+6,3/3/2026,M,21,Junior,Rest of world,No,3,Junior,M,Rest of Texas,20,No
+6,3/3/2026,M,21,Junior,Rest of world,No,4,Junior,M,Rest of World,21,No
+6,3/3/2026,M,21,Junior,Rest of world,No,5,Junior,M,Rest of World,21,No
+7,3/3/2026,F,20,Junior,Rest of Texas,No,1,Junior,F,Rest of Texas,20,No
+7,3/3/2026,F,20,Junior,Rest of Texas,No,2,Junior,F,Rest of Texas,20,No
+7,3/3/2026,F,20,Junior,Rest of Texas,No,3,Senior,F,Rest of Texas,20,No
+7,3/3/2026,F,20,Junior,Rest of Texas,No,4,Junior,F,Rest of Texas,20,No
+7,3/3/2026,F,20,Junior,Rest of Texas,No,5,Junior,F,Rest of Texas,20,No
+8,3/3/2026,M,23,Junior,Rest of Texas,No,1,Sophomore,F,Rest of World,19,Not a UT student
+8,3/3/2026,M,23,Junior,Rest of Texas,No,2,graduated,F,Rest of Texas,23,Yes
+8,3/3/2026,M,23,Junior,Rest of Texas,No,3,graduated,F,Rest of U.S.,44,Not a UT student
+8,3/3/2026,M,23,Junior,Rest of Texas,No,4,graduated,M,Rest of World,45,Not a UT student
+8,3/3/2026,M,23,Junior,Rest of Texas,No,5,no university,M,Rest of Texas,27,Not a UT student
+9,3/3/2026,F,19,Sophomore,Austin,Yes,1,Mom,F,Austin,56,Not a UT student
+9,3/3/2026,F,19,Sophomore,Austin,Yes,2,Sophomore,F,Austin,19,Not a UT student
+9,3/3/2026,F,19,Sophomore,Austin,Yes,3,Junior,F,Rest of Texas,21,No
+9,3/3/2026,F,19,Sophomore,Austin,Yes,4,Junior,F,Austin,21,No
+9,3/3/2026,F,19,Sophomore,Austin,Yes,5,Junior,F,Rest of Texas,20,Yes
+10,3/3/2026,F,20,Junior,Rest of Texas,Yes,1,Not student,F,Rest of World,49,Not a UT student
+10,3/3/2026,F,20,Junior,Rest of Texas,Yes,2,Junior,F,Rest of Texas,20,No
+10,3/3/2026,F,20,Junior,Rest of Texas,Yes,3,Sophomore,F,Rest of World,20,No
+10,3/3/2026,F,20,Junior,Rest of Texas,Yes,4,Sophomore,F,Rest of World,19,No
+10,3/3/2026,F,20,Junior,Rest of Texas,Yes,5,Other school,M,Rest of World,22,Not a UT student
+11,3/3/2026,F,19,Sophomore,Rest of Texas,No,1,Employed,M,Rest of Texas,25,Not a UT student
+11,3/3/2026,F,19,Sophomore,Rest of Texas,No,2,Sophomore,F,Rest of Texas,19,Not a UT student
+11,3/3/2026,F,19,Sophomore,Rest of Texas,No,3,Sophomore,F,Rest of Texas,19,Not a UT student
+11,3/3/2026,F,19,Sophomore,Rest of Texas,No,4,Sophomore,F,Rest of Texas,19,Not a UT student
+11,3/3/2026,F,19,Sophomore,Rest of Texas,No,5,Sophomore,M,Rest of Texas,19,Not a UT student
+12,3/3/2025,F,19,Sophomore,Rest of Texas,No,1,Employed,F,Rest of Texas,22,Not a UT student
+12,3/3/2025,F,19,Sophomore,Rest of Texas,No,2,Sophomore,F,Rest of Texas,19,Not a UT student
+12,3/3/2025,F,19,Sophomore,Rest of Texas,No,3,Sophomore,F,Rest of Texas,19,Not a UT student
+12,3/3/2025,F,19,Sophomore,Rest of Texas,No,4,Employed,M,Rest of U.S.,22,Not a UT student
+12,3/3/2025,F,19,Sophomore,Rest of Texas,No,5,Sophomore,M,Rest of U.S.,19,Not a UT student
+13,3/3/2026,M,20,Junior,Rest of Texas,Yes,1,Junior,M,Rest of U.S.,21,Yes
+13,3/3/2026,M,20,Junior,Rest of Texas,Yes,2,Junior,M,Rest of Texas,21,Yes
+13,3/3/2026,M,20,Junior,Rest of Texas,Yes,3,Junior,M,Rest of Texas,21,Yes
+13,3/3/2026,M,20,Junior,Rest of Texas,Yes,4,Junior,M,Rest of U.S.,20,No
+13,3/3/2026,M,20,Junior,Rest of Texas,Yes,5,Junior,M,Rest of U.S.,20,No
+14,2/26/2026,M,24,Junior,Rest of Texas,No,1,not a student,F,Rest of World,56,Not a UT student
+14,2/26/2026,M,24,Junior,Rest of Texas,No,2,not a student,M,Rest of World,26,Not a UT student
+14,2/26/2026,M,24,Junior,Rest of Texas,No,3,not a student,M,Rest of World,28,Not a UT student
+14,2/26/2026,M,24,Junior,Rest of Texas,No,4,not a student,M,Rest of World,26,Not a UT student
+14,2/26/2026,M,24,Junior,Rest of Texas,No,5,not a student,M,Rest of World,27,Not a UT student
+15,2/26/2026,F,21,Senior,Austin,No,1,Not a student,M,Rest of Texas,56,Not a UT student
+15,2/26/2026,F,21,Senior,Austin,No,2,Not a student,F,Rest of U.S.,49,Not a UT student
+15,2/26/2026,F,21,Senior,Austin,No,3,Junior,F,Rest of Texas,21,Not a UT student
+15,2/26/2026,F,21,Senior,Austin,No,4,Not a student,F,Austin,24,Not a UT student
+15,2/26/2026,F,21,Senior,Austin,No,5,Not a student,F,Austin,16,Not a UT student
