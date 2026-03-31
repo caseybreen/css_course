@@ -95,6 +95,9 @@ poststrat_weights <- sample_proportion %>%
   mutate(weight =  pop_proportion / sample_proportion) %>%      ## calculate weight 
   select(age_group, income_group, weight)
 
+## print out weights 
+poststrat_weights
+
 ```
 
 Now, we will assign these poststratification weights to the respondents in our sample. We will also re-scale the weights by dividing each weight by the average weight. This rescaling step ensures that the average weight is 1, which is helpful when calculating weighted sums and averages.
@@ -128,7 +131,7 @@ In this exercise, we will assess the impact of two different weighting strategie
 
 We want to construct weights as we suspect that the respondents in our non-probability sample may systematically differ from people in the general population we want to learn about.
 
-To begin, we will read in the data we'll need for this analysis:
+To begin, we will read in the data we'll need for this analysis. You will need to update the paths.
 
 ```{r}
 ## quota sample 

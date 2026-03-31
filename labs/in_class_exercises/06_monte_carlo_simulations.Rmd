@@ -1,0 +1,160 @@
+---
+title: "Monte Carlo Simulations" 
+author: Casey Breen
+---
+
+In this notebook, we'll first run an exercise looking at a simple monte-carlo simulation: tossing a coin. We'll then run a simple bootstrap, a method for calculating standard errors. 
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+Warmup exercise from class: 
+
+Suppose you roll a fair six-sided die 100 times. What is the probability of getting at least 20 sixes? We can answer this two ways: analytically using the binomial distribution, and by simulation using Monte Carlo methods. Comparing the two illustrates why Monte Carlo works.
+
+## Step 1: Set Up the Problem
+
+We define the number of rolls per experiment (100), the true probability of rolling a six (1/6), and the number of times we'll repeat the entire experiment (1,000 simulations). We set a seed so results are reproducible.
+
+```{r}
+# Set parameters
+set.seed(123)            # For reproducibility
+n_trials <- 100          # Number of dice rolls per experiment
+p_six <- 1/6             # Probability of rolling a six
+n_simulations <- 1000     # Number of Monte Carlo simulations
+threshold <- 20          # We want at least 20 sixes
+```
+
+## Step 2: Simulate
+
+We generate all the dice rolls at once — 100 rolls × 1,000 simulations = 100,000 random draws. The code `floor(runif(..., min = 1, max = 7))` produces integers 1 through 6 with equal probability, mimicking a fair die. We then reshape this into a data frame where each row is one experiment of 100 rolls, and count how many sixes appear in each row.
+
+```{r}
+# Simulate rolling a six-sided die
+sim_df <- data.frame(
+  sim_id = rep(1:n_simulations, each = n_trials),
+  roll = floor(runif(n_trials * n_simulations, min = 1, max = 7))
+) %>%
+  group_by(sim_id) %>%
+  summarise(six_count = sum(roll == 6)) %>%
+  mutate(meets_threshold = six_count >= threshold)
+```
+
+## Step 3: Estimate the Probability
+
+The Monte Carlo estimate is just the fraction of simulations where we got 20 or more sixes. We compare this to the exact answer from the binomial CDF: P(X ≥ 20) = 1 − P(X ≤ 19), where X ~ Binomial(100, 1/6).
+
+```{r}
+# Estimate probability
+prob_at_least_20_sim <- sim_df %>%
+  summarise(prob = mean(meets_threshold)) %>%
+  pull(prob)
+
+# Analytical solution
+prob_at_least_20_analytical <- 1 - pbinom(threshold - 1, size = n_trials, prob = p_six)
+
+# Print results
+print(paste("Monte Carlo estimated probability:", round(prob_at_least_20_sim, 4)))
+print(paste("Analytical probability:", round(prob_at_least_20_analytical, 4)))
+```
+
+## Step 4: Visualize
+
+We plot the distribution of six-counts across all simulations. The red dashed line marks the threshold of 20; the area to the right of it corresponds to the probability we just estimated.
+
+```{r}
+# Plot the distribution
+ggplot(sim_df, aes(x = six_count)) +
+  geom_histogram(binwidth = 1,
+                 fill = "lightblue", color = "black") +
+  geom_vline(xintercept = threshold, color = "red", linewidth = 1, linetype = "dashed") +
+  labs(title = "Distribution of Sixes in 100 Dice Rolls (Using runif)",
+       x = "Number of Sixes", y = "Density") +
+  annotate("text", x = threshold + 1.5, y = Inf, vjust = 2,
+           label = "Threshold (20 Sixes)", color = "red", hjust = 0) +
+  cowplot::theme_cowplot()
+```
+Exercises 
+
+What happens if you increase the number of dice rolls from 100 to 100,000? What changes? Is our estimate closer to the analytical solution?
+
+# Bootstrap standard errors 
+
+In this section, we'll use the bootstrap to quantify uncertainty around a measure of class year homophily — the tendency for students to name alters who share their class year.
+
+The basic idea is simple: if we could re-run our survey many times, we'd get a different homophily estimate each time. This is because our sample by definition doesn't include everyone in the population. 
+
+We can't actually re-run our survey many time (or don't want to), but we can approximate it by resampling from the data we have. Each bootstrap resample draws $n$ egos (with replacement) from our observed data, computes the mean homophily, and stores it. After 1,000 resamples, we have an empirical distribution of what the estimate could have been under sampling variability — and we can use that distribution to construct confidence intervals. 
+
+This can be done either by assuming the distribution of estimates is normally distributed or by taking the 0.025 and 97.5 CI to create a 95% CI. 
+
+
+```{r}
+network_df <- read_csv(here("data", "homophily_survey.csv"))
+```
+First, we compute ego-level homophily: for each ego, what fraction of their alters share their class year? Then we bootstrap the mean of that proportion by resampling egos with replacement 1,000 times.
+
+
+```{r}
+# Compute homophily for each ego
+homophily_df_sophomore <- network_df %>%
+  mutate(same_classyear = ego_classyear == alter_classyear) %>%
+  group_by(ego_id) %>%
+  summarise(prop_same = mean(same_classyear))
+
+# Observed mean homophily
+observed_homophily <- mean(homophily_df_sophomore$prop_same)
+
+# First set a seed 
+set.seed(123)
+n_boot <- 1000
+
+## create a list to store estimates 
+bootstrap_list <- list()
+
+## loop over each bootstrap iteration
+for (i in 1:n_boot){
+  
+  ## draw a bootstrap resample with replacement 
+  boot_sample <- homophily_df %>%
+    sample_n(size = nrow(homophily_df), replace = T)
+  
+  bootstrap_list[[i]] <- boot_sample %>%
+    summarize(mean = mean(prop_same)) %>% 
+    mutate(boot_id = i)
+}
+
+## combine into a sinle bootstrap 
+bootstrap_df <- bind_rows(bootstrap_list)
+
+bootstrap_df
+```
+
+
+Exercise: 
+
+1. Create a histogram of the bootstrapped estimates. What does the shape of this distribution tell you?
+2. Calculate a 95% confidence interval using the quantile method (i.e., take the 2.5th and 97.5th percentiles of the bootstrap distribution).
+3. Add the observed mean and the confidence interval bounds to your histogram using `geom_vline()`.
+
+```{r}
+## Hints
+
+## Q1 - create histogram
+# + geom_histogram()
+
+## Q2 - quantile method (percentile bootstrap)
+# ci_quantile <- tibble(boot_means) %>%
+#   summarise(
+#     lower = quantile(boot_means, <FILL IN>),
+#     upper = quantile(boot_means, <FILL IN>)
+#   )
+
+## Q3 - add on a line to a ggplot
+# + geom_vline(xintercept = c(ci_quantile$lower, ci_quantile$upper), color = "red", linetype = "dashed", size = 1)
+```
+
+
+
