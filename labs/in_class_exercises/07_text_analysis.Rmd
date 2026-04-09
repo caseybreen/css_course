@@ -1,0 +1,347 @@
+---
+title: "Text Analysis with tidytext"
+author: Casey Breen
+---
+
+Summary: In this notebook, we'll use the `tidytext` package to analyze text from three different set of academic peer reviews. We'll cover tokenization, word frequencies, dictionary methods, and sentiment analysis. Our data: three sets of peer reviews for different academic papers.
+
+```{r}
+# install.packages("textdata") 
+
+## library packages
+library(tidyverse)
+library(tidytext)
+library(pdftools)
+library(cowplot)
+library(textdata)
+```
+
+## Step 1: Read in the PDFs
+
+We have three sets of peer reviews saved as PDFs. Let's read them in using the `pdftools` package and store them in a single data frame.
+
+Please download these reviews here: https://github.com/caseybreen/css_course/tree/main/data
+
+```{r}
+## read in PDFs — pdf_text() returns a character vector, one element per page
+reviews_1_text <- pdf_text("../../data/reviews_1.pdf")
+reviews_2_text <- pdf_text("../../data/reviews_2.pdf")
+reviews_3_text <- pdf_text("../../data/reviews_3.pdf")
+```
+
+Let's take a look at the raw text from the first page of reviews_1:
+
+```{r}
+## print the first page
+cat(reviews_1_text[1])
+```
+
+Now let's combine everything into a tidy data frame. Each row will be one page of text, with a column identifying which review set it came from. 
+
+
+```{r}
+## combine into a single data frame
+reviews_df <- bind_rows(
+  tibble(review_set = "Paper 1", page = 1:length(reviews_1_text), text = reviews_1_text),
+  tibble(review_set = "Paper 2", page = 1:length(reviews_2_text), text = reviews_2_text),
+  tibble(review_set = "Paper 3", page = 1:length(reviews_3_text), text = reviews_3_text)
+)
+
+## take a look
+reviews_df
+```
+
+## Step 2: Tokenization
+
+The key idea in `tidytext` is converting text into a **tidy** format: one token (word) per row. The `unnest_tokens()` function does this for us.
+
+```{r}
+## tokenize: split text into individual words
+reviews_tokens <- reviews_df %>%
+  unnest_tokens(word, text)
+
+## look at the result
+reviews_tokens
+```
+
+**Understanding check:** How many rows does `reviews_tokens` have? Why is it so much larger than `reviews_df`?
+
+## Step 3: Remove stop words
+
+Stop words are common words like "the", "and", "is" that don't carry much meaning. The `tidytext` package includes a built-in list of stop words.
+
+```{r}
+## look at the stop words list
+data(stop_words)
+head(stop_words, 10)
+```
+
+We use an `anti_join()` to remove stop words — this keeps only the words that are *not* in the stop words list.
+
+```{r}
+## remove stop words
+reviews_clean <- reviews_tokens %>%
+  anti_join(stop_words, by = "word")
+
+## how many words did we remove?
+nrow(reviews_tokens) - nrow(reviews_clean)
+```
+
+## Step 4: Word frequencies
+
+Now let's count the most common words in each set of reviews.
+
+```{r}
+## count words by review set
+word_counts <- reviews_clean %>%
+  count(review_set, word, sort = TRUE)
+
+word_counts
+```
+
+Let's visualize the top 15 words for each review set:
+
+```{r}
+## plot top 15 words per review set
+word_counts %>%
+  group_by(review_set) %>%
+  slice_max(n, n = 15) %>%
+  ungroup() %>%
+  mutate(word = reorder_within(word, n, review_set)) %>%
+  ggplot(aes(x = n, y = word, fill = review_set)) +
+  geom_col(show.legend = FALSE, alpha = 0.8) +
+  facet_wrap(~review_set, scales = "free_y") +
+  scale_y_reordered() +
+  theme_cowplot() +
+  labs(x = "Count", y = NULL, title = "Most common words by review set")
+```
+
+**Understanding check:** What do the most common words tell you about what each paper is about?
+
+## Step 5: Dictionary methods
+
+A dictionary method is simple: we define a list of words that belong to a category, and then we count how often those words appear. This is one of the most straightforward approaches to text analysis.
+
+Let's create a custom dictionary to classify reviewer language into categories relevant to peer review.
+
+```{r}
+## define a custom peer review dictionary
+review_dictionary <- tibble(
+  word = c(
+    ## methodology concerns
+    "overfit", "overfitting", "validation", "validate", "bias", "error",
+    "errors", "residuals", "uncertainty", "robust", "robustness",
+    ## positive evaluation
+    "impressive", "excellent", "important", "interesting", "valuable", "strong",
+    "clear", "nice", "enjoyed", "wonderful", "helpful", "strength", "strengths",
+    ## negative evaluation
+    "lacking", "disappointing", "flawed", "problematic", "poor", "poorly",
+    "weak", "missing", "unclear", "insufficient", "outdated", "concern", "concerns",
+    ## suggestions
+    "suggest", "suggestion", "improve", "improvement", "consider",
+    "recommend", "request", "include", "adding", "clarify"
+  ),
+  category = c(
+    rep("Methodology", 11),
+    rep("Positive", 13),
+    rep("Negative", 13),
+    rep("Suggestion", 10)
+  )
+)
+
+review_dictionary
+```
+
+Now let's apply the dictionary by joining it with our tokenized reviews:
+
+```{r}
+## apply dictionary using inner_join
+dictionary_results <- reviews_clean %>%
+  inner_join(review_dictionary, by = "word")
+
+## count by review set and category
+dictionary_summary <- dictionary_results %>%
+  count(review_set, category)
+
+dictionary_summary
+```
+
+```{r}
+## visualize dictionary results
+dictionary_summary %>%
+  ggplot(aes(x = category, y = n, fill = review_set)) +
+  geom_col(position = "dodge", alpha = 0.8) +
+  theme_cowplot() +
+  scale_fill_viridis_d() + 
+  labs(x = "Category", y = "Count", fill = "Review Set",
+       title = "Dictionary-based classification of reviewer language") +
+  theme(legend.position = "bottom")
+```
+
+We can also compute the share of dictionary words in each category per review set — this accounts for the fact that some reviews are longer than others.
+
+```{r}
+## compute proportions within each review set
+dictionary_proportions <- dictionary_results %>%
+  count(review_set, category) %>%
+  group_by(review_set) %>%
+  mutate(proportion = n / sum(n)) %>%
+  ungroup()
+
+dictionary_proportions %>%
+  ggplot(aes(x = category, y = proportion, fill = review_set)) +
+  geom_col(position = "dodge", alpha = 0.8) +
+  theme_cowplot() +
+    scale_fill_viridis_d() + 
+  scale_y_continuous(labels = scales::percent) +
+  labs(x = "Category", y = "Share of dictionary words", fill = "Review Set",
+       title = "Proportion of reviewer language by category") +
+  theme(legend.position = "bottom")
+```
+
+**Understanding check:** What are the strengths and limitations of dictionary methods? When might they miss important context?
+
+## Step 6: Sentiment analysis
+
+Sentiment analysis uses pre-built dictionaries (lexicons) to classify words as positive or negative. The `tidytext` package gives us access to several sentiment lexicons.
+
+### AFINN lexicon
+
+The AFINN lexicon scores words on a scale from -5 (most negative) to +5 (most positive).
+
+```{r}
+## look at the AFINN lexicon
+afinn <- get_sentiments("afinn")
+head(afinn, 10)
+```
+
+```{r}
+## join with our review tokens
+afinn_scores <- reviews_clean %>%
+  inner_join(afinn, by = "word")
+
+## compute average sentiment by review set
+afinn_summary <- afinn_scores %>%
+  group_by(review_set) %>%
+  summarize(
+    mean_sentiment = mean(value),
+    sd_sentiment = sd(value),
+    n_words = n(),
+    se = sd_sentiment / sqrt(n_words)
+  )
+
+afinn_summary
+```
+
+```{r}
+## plot average sentiment with confidence intervals
+afinn_summary %>%
+  ggplot(aes(x = review_set, y = mean_sentiment,
+             ymin = mean_sentiment - 1.96 * se,
+             ymax = mean_sentiment + 1.96 * se)) +
+  geom_pointrange(shape = 21, fill = "white", size = 1) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey50") +
+  theme_cowplot() +
+  labs(x = "Review Set", y = "Mean AFINN Sentiment Score",
+       title = "Average sentiment by review set")
+```
+
+### Bing lexicon
+
+The Bing lexicon classifies words as simply "positive" or "negative."
+
+```{r}
+## look at bing lexicon
+bing <- get_sentiments("bing")
+head(bing, 10)
+
+bing <- bing %>% filter(!word %in% c("inequality", "inequalities"))
+```
+
+```{r}
+## join with our tokens
+bing_scores <- reviews_clean %>%
+  inner_join(bing, by = "word")
+
+## count positive and negative words by review set
+bing_summary <- bing_scores %>%
+  count(review_set, sentiment)
+
+bing_summary
+```
+
+```{r}
+## visualize
+bing_summary %>%
+  ggplot(aes(x = review_set, y = n, fill = sentiment)) +
+  geom_col(position = "dodge", alpha = 0.8) +
+  scale_fill_manual(values = c("negative" = "darkred", "positive" = "steelblue")) +
+  theme_cowplot() +
+  labs(x = "Review Set", y = "Word Count", fill = "Sentiment",
+       title = "Positive vs. negative words by review set (Bing lexicon)") + 
+  theme(legend.position = "bottom")
+```
+
+Let's look at which specific words are driving the sentiment:
+
+```{r}
+## top positive and negative words across all reviews
+bing_word_counts <- bing_scores %>%
+  count(word, sentiment, sort = TRUE) %>%
+  group_by(sentiment) %>%
+  slice_max(n, n = 10) %>%
+  ungroup()
+
+bing_word_counts %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(x = n, y = word, fill = sentiment)) +
+  geom_col(show.legend = FALSE, alpha = 0.8) +
+  facet_wrap(~sentiment, scales = "free_y") +
+  scale_fill_manual(values = c("negative" = "indianred", "positive" = "steelblue")) +
+  theme_cowplot() +
+  labs(x = "Count", y = NULL, title = "Top sentiment words across all reviews")
+```
+
+**Understanding check:** Look at the top "negative" words. Are all of them actually negative in the context of peer review? What does this tell us about the limitations of sentiment analysis?
+
+### NRC lexicon
+
+The NRC lexicon classifies words into 8 emotions (anger, anticipation, disgust, fear, joy, sadness, surprise, trust) plus positive/negative.
+
+```{r}
+## get nrc lexicon
+nrc <- get_sentiments("nrc")
+
+## join with tokens
+nrc_scores <- reviews_clean %>%
+  inner_join(nrc, by = "word")
+
+## count emotions by review set (exclude positive/negative)
+nrc_summary <- nrc_scores %>%
+  filter(!sentiment %in% c("positive", "negative")) %>%
+  count(review_set, sentiment)
+
+## visualize
+nrc_summary %>%
+  ggplot(aes(x = sentiment, y = n, fill = review_set)) +
+  geom_col(position = "dodge", alpha = 0.8) +
+  theme_cowplot() +
+  labs(x = "Emotion", y = "Count", fill = "Review Set",
+       title = "NRC emotion classification by review set") +
+  theme(axis.text.x = element_text(angle = -45, vjust = 0.5, hjust = 0),
+        legend.position = "bottom")
+```
+
+## Exercises
+
+1. Imagine you are the editor handling each of these papers. Based solely on the analyses above, which paper would you accept? Which would you give an R&R? Which would you reject? Briefly justify each decision.
+
+2. Use an LLM of your choice to make the same accept / R&R / reject decision for each paper. You may prompt it however you like, but document the approach you used (model, prompt, any context you provided). Does the LLM agree with your judgments in (1)? Where it disagrees, what does it seem to be weighting differently?
+
+3. Now read the actual peer reviews for each paper. After reading them, what is your final recommendation? Note any cases where the reviews changed your mind.
+
+Bonus: 
+
+B1. Create a new custom dictionary with categories relevant to academic writing (e.g., "data quality", "theory", "writing quality"). Apply it to the reviews and visualize the results.
+
+B2. The word "important" shows up as positive in most sentiment lexicons. But reviewers sometimes write "important limitation" or "important concern." Find 3 examples of words in our analysis where the sentiment classification might be misleading. How could we address this?

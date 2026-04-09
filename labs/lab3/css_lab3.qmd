@@ -119,6 +119,26 @@ sample_data_weighted <- sample_data_weighted %>%
 3.  Estimate the weighted and unweighted number of cups of coffee consumed daily. Which estimate is larger?
 4.  Do we trust our new weighted estimates of the average number of coffee drinkers? In what ways might our re-weighted sample still differ from the general population?
 
+```{r}
+## Q1 
+sample_data_weighted %>% 
+  ggplot(aes(x = weight)) + 
+  geom_histogram(color = "black", fill = "grey") + 
+  theme_cowplot()
+
+## Q2 
+sample_data_weighted %>% 
+  summarize(mean(weight))
+
+## Q3 
+sample_data_weighted %>% 
+  summarize(unweighted = mean(coffee_consumption),
+            weighted = mean(coffee_consumption * weight))
+  
+## Q4 
+
+```
+
 ## Exercise 2
 
 ***Estimating crude death rates with a non-probability sample***
@@ -252,7 +272,7 @@ neighbour_estimates <- network_survival_estimator(data = quota_sample,
 cdr_unweighted <- bind_rows(kin_estimates, neighbour_estimates) %>% 
   mutate(weights = "Unweighted")
 
-## rpint out death rate estimates 
+## print out death rate estimates 
 cdr_unweighted
 ```
 
@@ -459,7 +479,64 @@ We're worried that our quota sample is over-representing higher SES individuals.
 
 **2.1** Recalculate the inverse probability weights using a new logistic regression model with the following additional predictors: `manufactured_material_house,` `bed,` `radio,` and `modern_fuel_type`. These covariates provide a proxy measure of wealth, measuring whether: (i) a respondent's home was built with modern construction materials (1 = yes, 0 = no), (ii) respondent owns a bed, (iii) respondent owns a radio, and (iv) respondent uses modern fuel for cooking. Are these predictors statistically significant in our new logistic regression model?
 
+```{r}
+## fit a logistic regression
+selection_model_new <- glm(inclusion ~ gender + age_class + manufactured_material_house + bed + radio + modern_fuel_type, data = pooled_sample, family = "binomial")
+
+## print summary of model 
+summary(selection_model_new)
+
+```
+
 **2.2** Re-estimate the crude death rate using the new weights (using both kin and neighbour networks). How does your crude death rate change? Make a plot comparing the unweighted estimate, poststratification estimate, and the new inverse probability weighted estimate.
+
+```{r}
+## generate ipw weights 
+inclusion_prob_new <- predict(object = selection_model_new, newdata = quota_sample, type = "response")
+
+## quota sample 
+quota_sample <- quota_sample %>% 
+  mutate(weight_ipw_ses = 1/inclusion_prob_new) %>% 
+  mutate(weight_ipw_ses = weight_ipw_ses/ mean(weight_ipw_ses)) ## re-scale weights
+
+
+## calculate cdr with inverse probability weights (kin)
+kin_estimates_ipw_ses <- network_survival_estimator(data = quota_sample,
+                                                      deaths = "num_deaths_kin",
+                                                      degree = "num_total_kin",
+                                                      weights = "weight_ipw_ses",
+                                                      exposure_days = 120) %>% 
+  mutate(tie = "kin")
+
+## calculate cdr with inverse probability weights (neighbour)
+neighbour_estimates_ipw_ses <- network_survival_estimator(data = quota_sample,
+                                                           deaths = "num_deaths_neighbours",
+                                                           degree = "num_total_neighbour",
+                                                           weights = "weight_ipw_ses",
+                                                           exposure_days = 120) %>% 
+  mutate(tie = "neighbour")
+
+## combine together estimates 
+cdr_ipw_new <- bind_rows(kin_estimates_ipw_ses, neighbour_estimates_ipw_ses) %>% 
+  mutate(weights = "Inverse Probability Weights SES")
+```
+
+```{r}
+## inverse probability weights 
+cdr_estimates %>% 
+  bind_rows(cdr_ipw) %>% 
+  bind_rows(cdr_ipw_new) %>% 
+    mutate(weights = factor(weights, levels = c("Unweighted", "Poststratification Weights", "Inverse Probability Weights", "Inverse Probability Weights SES"))) %>%  # Reorder weights
+  ggplot(aes(y = death_rate, x = reorder(tie, -death_rate), fill = weights)) + 
+  geom_col(size = 3, position = position_dodge2(.3)) + 
+  theme_cowplot() + 
+  ylim(0, .5) + 
+  theme(legend.position = "bottom") + 
+  labs(x = "",
+       y = "Death Rate") + 
+  geom_text(aes(y = death_rate + .02, label = round(death_rate, 3)), 
+            position = position_dodge2(1))
+```
 
 **2.3** Speculate on why our estimated crude death rates changed under inverse probability weighting. What does this tell us about the mortality in the kin and neighbor networks of low vs. high SES respondents?
 
